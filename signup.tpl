@@ -1,7 +1,7 @@
 %rebase layout.tpl url=get_url, logged_in = logged_in
 <h3>Sign Up</h3>
 Enter your account information.<br/>
-<form action="/login" method="POST">
+<form action="/signup" method="POST">
     <p>
         <label for="first_name">First Name:</label><br/>
         <input type="text" name="first_name"><br/>
@@ -23,6 +23,6 @@ Enter your account information.<br/>
         <input type="password" name="password"><br/>
     </p>
     <p>
-        <input type="submit" value="Log In"><br/>
+        <input type="submit" value="Sign Up"><br/>
     </p>
 </form>
