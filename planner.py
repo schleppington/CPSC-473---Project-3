@@ -1,7 +1,7 @@
 import sqlite3, sha, time, Cookie, os
 from bottle import route, post, debug, run, template, request, static_file, url, response, redirect, install
 from bottle_redis import RedisPlugin
-from bottle.ext import sqlite
+#from bottle.ext import sqlite
 
 
 install(RedisPlugin())
@@ -14,6 +14,7 @@ install(RedisPlugin())
 #accounts:username                          // where the username is the actual username... ex: accounts:TesterJester. 
 #                                           // The value stored here is the key number.
 #accounts:no:password                       // Password for the account @ the given "no"
+#accounts:email                             // Set of all emails since emails need to be unique.
 
 #EVENT INFO:
 #planner:no:events
@@ -78,12 +79,39 @@ def userhome_route():
 
 
 @route('/signup')
-def login_route():
+def signup_route():
     if isLoggedIn():
         redirect('/userhome')
     else:
         logged_in = False 
         return template('signup.tpl', get_url=url, logged_in=logged_in)
+
+
+
+@post('/signup')
+def signup_submit(rdb):
+    uFirst = request.POST.get('first_name','').strip()
+    uLast = request.POST.get('last_name','').strip()
+    uEmail = request.POST.get('email_address','').strip()
+    uName = request.POST.get('username','').strip()
+    uPass = request.POST.get('password','').strip()
+
+    if not rdb.sismember('account:emails', uEmail) and not rdb.get("accounts:" + uName):
+        no = next_id(rdb)
+
+        rdb.set('accounts:' + uName, no)
+        rdb.sadd('account:emails', uEmail)
+        rdb.set('accounts:' + no + ':password', uPass)
+        rdb.set('accounts:' + no + ':username', uName)
+        rdb.set('accounts:' + no + ':useremail', uEmail)
+        rdb.set('accounts:' + no + ':firstname', uFirst)
+        rdb.set('accounts:' + no + ':lastname', uLast)
+
+        
+        response.set_cookie("account", uName, secret='pass')
+        redirect('/userhome')
+    else:
+        return template('loginfail.tpl', get_url=url, logged_in=False)
 
 
 
