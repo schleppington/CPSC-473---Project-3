@@ -1,81 +1,121 @@
 import sqlite3, sha, time, Cookie, os
-from bottle import route, post, debug, run, template, request, static_file, url, response, redirect
+from bottle import route, post, debug, run, template, request, static_file, url, response, redirect, install
+from bottle_redis import RedisPlugin
+from bottle.ext import sqlite
 
-#app = bottle.Bottle()
+
+install(RedisPlugin())
+
 #plugin = sqlite.Plugin(dbfile='todo.db')
-#app.install(plugin)
+#install(plugin)
+
+#REDIS NOTES:
+#ACCOUNT INFO (stored datatype TBD, but atm this is how it looks):
+#accounts:username                          // where the username is the actual username... ex: accounts:TesterJester. 
+#                                           // The value stored here is the key number.
+#accounts:no:password                       // Password for the account @ the given "no"
+
+#EVENT INFO:
+#planner:no:events
+#event:num:tasks
+#task:number:details                        // Details of task @ the given "number"
+#publicevents                               // All public events
+
+
 
 @route('/')
 def default_route():
-    username = request.get_cookie("account", secret='pass')
-    if username:
-        logged_in = True
-    else:
-        logged_in = False
+    logged_in = isLoggedIn()
+
     return template('default.tpl', get_url=url, logged_in=logged_in)
+
+
 
 @route('/:path#.+#', name='static')
 def static(path):
     return static_file(path, root='')
 
+
+
 @route('/login')
 def login_route():
-    username = request.get_cookie("account", secret='pass')
-    if username:
-        redirect('/userhome')
-    else:
-        logged_in = False
-        return template('login.tpl', get_url=url, logged_in=logged_in)
+    logged_in = isLoggedIn()
+
+    return template('login.tpl', get_url=url, logged_in=logged_in)
+
+
 
 @route('/logout')
 def logout_route():
-    username = request.get_cookie("account", secret='pass')
-    if username:
+    if isLoggedIn():
         response.delete_cookie("account", secret='pass')
     redirect('/')
 
+
+
 @post('/login') # or @route('/login', method='POST')
-def login_submit():
-    username = request.forms.get('username')
-    password = request.forms.get('password')
-    
-    if check_login(username, password):
+def login_submit(rdb):
+    username = request.POST.get('username','').strip()
+    password = request.POST.get('password','').strip()
+
+    if check_login(rdb, username, password):
         response.set_cookie("account", username, secret='pass')
         redirect('/userhome')      
     else:
         logged_in = False
         return template('loginfail.tpl', get_url=url, logged_in=logged_in)
 
+
+
 @route('/userhome')
 def userhome_route():
-    username = request.get_cookie("account", secret='pass')
-    if username:
+    if isLoggedIn():
         logged_in = True
         return template('userhome.tpl', get_url=url, logged_in=logged_in)
     else:
         redirect('/login')
 
+
+
 @route('/signup')
 def login_route():
-    username = request.get_cookie("account", secret='pass')
-    if username:
+    if isLoggedIn():
         redirect('/userhome')
     else:
         logged_in = False 
         return template('signup.tpl', get_url=url, logged_in=logged_in)
 
-def check_login(username, password):
-    conn = sqlite3.connect('planner.db')
-    c = conn.cursor()
-    c.execute("SELECT password FROM users WHERE username = ?", [username])
-    result = c.fetchone()
-    if result == None:
-        return False
+
+
+def next_id(rdb):
+
+    #TODO: Randomize keys
+    try:
+        rdb.incr('no')
+    except:
+        rdb.setnx('no', 1)
+
+    return  rdb.get('no')
+
+
+
+def check_login(rdb, username, password):
+    #TODO: implement salted password check
+    no = rdb.get("accounts:" + username)
+    if no and rdb.get("accounts:" + no + ":password") == password:
+        return True
+
+    return False
+
+
+
+def isLoggedIn():
+    if request.get_cookie("account", secret='pass'):
+        return True
     else:
-        if (password == result[0]):
-            return True
-        else:
-            return False
+        return False
+
+
 
 debug(True)
 run(reloader=True)
