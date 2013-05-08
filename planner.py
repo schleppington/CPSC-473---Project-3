@@ -3,6 +3,7 @@ from bottle import get, post, route, debug, run, template, request
 from bottle import static_file, url, response, redirect, install
 from bottle_redis import RedisPlugin
 
+import account
 
 install(RedisPlugin())
 
@@ -111,7 +112,7 @@ def static(path):
 
 @get('/login')
 def login_route():
-    logged_in = isLoggedIn()
+    logged_in = account.isLoggedIn()
     if logged_in:
         redirect('/userhome')
     else:
@@ -124,7 +125,7 @@ def login_submit(rdb):
     username = request.POST.get('username','').strip()
     password = request.POST.get('password','').strip()
 
-    if check_login(rdb, username, password):
+    if account.check_login(rdb, username, password):
         response.set_cookie('account', username, secret='pass', max_age=600)
         redirect('/userhome')
     else:
@@ -134,7 +135,7 @@ def login_submit(rdb):
 
 @get('/logout')
 def logout_route():
-    if isLoggedIn():
+    if account.isLoggedIn():
         response.delete_cookie('account', secret='pass')
     redirect('/login')
 
@@ -142,7 +143,7 @@ def logout_route():
 
 @route('/userhome')
 def userhome_route(rdb):
-   if isLoggedIn():
+   if account.isLoggedIn():
        user = request.get_cookie('account', secret='pass')
        user_id = str(int(rdb.zscore('accounts:usernames', user)))
 
@@ -300,49 +301,6 @@ def next_id(rdb):
     return  rdb.get('no')
 
 
-
-########################################################################
-#check_login - compares given username and password with stored info
-#   param - rdb - redis db ojbect passed by plugin
-#   param - username - users account name used
-#   param - password - users password to compare
-#   return - Boolean - True if account info matches
-########################################################################
-
-def check_login(rdb, username, password):
-    #get user's account number
-    no = rdb.zscore('accounts:usernames', username)
-    print no
-    if not no:
-        return False
-
-    no = str(int(no))
-    #get user's salt
-    uSalt = rdb.hget('account:' + no, 'salt')
-    saltedpw = uSalt + password
-
-    #encrypt salted password
-    encpw = hashlib.sha512(saltedpw).hexdigest()
-
-    #compare and return result
-    if no and rdb.hget('account:' + no, 'password') == encpw:
-        return True
-
-    return False
-
-
-
-########################################################################
-#isLoggedIn - checks to see if the current user is logged into our
-#             system
-#return - Boolean - True if the user is logged in
-########################################################################
-
-def isLoggedIn():
-    if request.get_cookie('account', secret='pass'):
-        return True
-    else:
-        return False
 
 
 
