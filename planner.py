@@ -13,22 +13,37 @@ install(RedisPlugin())
 #   Hash tables:
 #
 #      Key: account:no
-#       Fields:         'firstname' : firstname, 'lastname' : lastname,
-#                   'useremail' : useremail, 'username' : username,
-#                   'password' : password, 'salt' : salt
+#       Fields:     'firstname' : firstname,
+#                   'lastname' : lastname,
+#                   'useremail' : useremail, 
+#                   'username' : username,
+#                   'password' : password, 
+#                   'salt' : salt
 #
 #      Key: event:ano:eno
-#       Fields:		'ename' : ename, 'eduedate' : eduedate, 'eventdesc' : eventdesc,
-#                   'numinvited' : numinvited, 'responded' : responded,
-#                   'numattending' : numattending, 'public' : True/False,
-#                   'estatus' : 'estatus', 'etype' : etype, 'numtasks' : numtasks
+#       Fields:		'ename' : ename, 
+#                   'eduedate' : eduedate, 
+#                   'eventdesc' : eventdesc,
+#                   'numinvited' : numinvited, 
+#                   'responded' : responded,
+#                   'numattending' : numattending, 
+#                   'public' : True/False,
+#                   'estatus' : 'estatus', 
+#                   'etype' : etype, 
+#                   'numtasks' : numtasks
 #
 #      Key: task:ano:eno:tno
-#      Fields:      'tname' : tname, 'tinfo' : tinfo, 'tcost' : tcost, 'tstatus' : tstatus,
-#                         'numitems' : numitems  
+#      Fields:      'tname' : tname, 
+#                   'tinfo' : tinfo, 
+#                   'tcost' : tcost, 
+#                   'tstatus' : tstatus,
+#                   'numitems' : numitems  
 #
 #      Key: item:ano:eno:tno:ino
-#      Fields:		'iname' : iname, 'icost' : icost, 'inotes' : inotes, 'istatus' : istatus
+#      Fields:		'iname' : iname, '
+#                   'icost' : icost, 
+#                   'inotes' : inotes, 
+#                   'istatus' : istatus
 #
 #   Sets:
 #       accounts:usernames                          // Set of all usernames
@@ -296,7 +311,13 @@ def next_id(rdb):
 
 def check_login(rdb, username, password):
     #get user's account number
-    no = str(int(rdb.zscore('accounts:usernames', username)))
+    hasaccount = rdb.zrank('accounts:usernames', username)
+    print hasaccount
+    if hasaccount:        
+        no = str(int(rdb.zscore('accounts:usernames', username)))
+        print no
+    else:
+        return False
 
     #get user's salt
     uSalt = rdb.hget('account:' + no, 'salt')
