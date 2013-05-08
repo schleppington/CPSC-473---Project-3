@@ -4,6 +4,13 @@ from bottle import static_file, url, response, redirect, install
 from bottle_redis import RedisPlugin
 
 
+
+########################################################################
+#create_account - create a new account record in the database with the 
+#                 posted data from the form
+#   param - rdb - redis db ojbect passed by plugin
+#   return - boolean - True if the account was successfully created
+########################################################################
 def create_account(rdb):
     firstname = request.POST.get('first_name','').strip()
     lastname = request.POST.get('last_name','').strip()
