@@ -3,6 +3,7 @@ from bottle import get, post, route, debug, run, template, request
 from bottle import static_file, url, response, redirect, install
 from bottle_redis import RedisPlugin
 
+import account
 
 install(RedisPlugin())
 
@@ -13,25 +14,40 @@ install(RedisPlugin())
 #   Hash tables:
 #
 #      Key: account:no
-#       Fields:         'firstname' : firstname, 'lastname' : lastname,
-#                   'useremail' : useremail, 'username' : username,
-#                   'password' : password, 'salt' : salt
+#       Fields:     'firstname' : firstname,
+#                   'lastname' : lastname,
+#                   'useremail' : useremail, 
+#                   'username' : username,
+#                   'password' : password, 
+#                   'salt' : salt
 #
 #      Key: event:ano:eno
-#       Fields:		'ename' : ename, 'eduedate' : eduedate, 'eventdesc' : eventdesc,
-#                   'numinvited' : numinvited, 'responded' : responded,
-#                   'numattending' : numattending, 'public' : True/False,
-#                   'estatus' : 'estatus', 'etype' : etype, 'numtasks' : numtasks
+#       Fields:		'ename' : ename, 
+#                   'eduedate' : eduedate, 
+#                   'eventdesc' : eventdesc,
+#                   'numinvited' : numinvited, 
+#                   'responded' : responded,
+#                   'numattending' : numattending, 
+#                   'public' : True/False,
+#                   'estatus' : 'estatus', 
+#                   'etype' : etype, 
+#                   'numtasks' : numtasks
 #
 #      Key: task:ano:eno:tno
-#      Fields:      'tname' : tname, 'tinfo' : tinfo, 'tcost' : tcost, 'tstatus' : tstatus,
-#                         'numitems' : numitems  
+#      Fields:      'tname' : tname, 
+#                   'tinfo' : tinfo, 
+#                   'tcost' : tcost, 
+#                   'tstatus' : tstatus,
+#                   'numitems' : numitems  
 #
 #      Key: item:ano:eno:tno:ino
-#      Fields:		'iname' : iname, 'icost' : icost, 'inotes' : inotes, 'istatus' : istatus
+#      Fields:		'iname' : iname, '
+#                   'icost' : icost, 
+#                   'inotes' : inotes, 
+#                   'istatus' : istatus
 #
 #   Sets:
-#       accounts:usernames                          // Set of all usernames
+#       accounts:usernames                          // Sorted Set of all usernames
 #       accounts:emails                             // Set of all user emails
 #       account:no:public                           // Set of all public events this account owns
 #       account:no:private                          // Set of all private events this account owns
@@ -96,7 +112,7 @@ def static(path):
 
 @get('/login')
 def login_route():
-    logged_in = isLoggedIn()
+    logged_in = account.isLoggedIn()
     if logged_in:
         redirect('/userhome')
     else:
@@ -109,8 +125,8 @@ def login_submit(rdb):
     username = request.POST.get('username','').strip()
     password = request.POST.get('password','').strip()
 
-    if check_login(rdb, username, password):
-        response.set_cookie('account', username, secret='pass')
+    if account.check_login(rdb, username, password):
+        response.set_cookie('account', username, secret='pass', max_age=600)
         redirect('/userhome')
     else:
         return template('loginfail.tpl', get_url=url, logged_in=False)
@@ -119,7 +135,7 @@ def login_submit(rdb):
 
 @get('/logout')
 def logout_route():
-    if isLoggedIn():
+    if account.isLoggedIn():
         response.delete_cookie('account', secret='pass')
     redirect('/login')
 
@@ -127,7 +143,7 @@ def logout_route():
 
 @route('/userhome')
 def userhome_route(rdb):
-   if isLoggedIn():
+   if account.isLoggedIn():
        user = request.get_cookie('account', secret='pass')
        user_id = str(int(rdb.zscore('accounts:usernames', user)))
 
@@ -193,7 +209,7 @@ def signup_submit(rdb):
                    'useremail' : useremail, 'username' : username,
                    'password' : encpw, 'salt' : uSalt })
         
-        response.set_cookie('account', username, secret='pass')
+        response.set_cookie('account', username, secret='pass', max_age=600)
         logged_in = True
         return template('userhome.tpl', get_url=url, logged_in=logged_in)
     except:
@@ -285,45 +301,6 @@ def next_id(rdb):
     return  rdb.get('no')
 
 
-
-########################################################################
-#check_login - compares given username and password with stored info
-#   param - rdb - redis db ojbect passed by plugin
-#   param - username - users account name used
-#   param - password - users password to compare
-#   return - Boolean - True if account info matches
-########################################################################
-
-def check_login(rdb, username, password):
-    #get user's account number
-    no = str(int(rdb.zscore('accounts:usernames', username)))
-
-    #get user's salt
-    uSalt = rdb.hget('account:' + no, 'salt')
-    saltedpw = uSalt + password
-
-    #encrypt salted password
-    encpw = hashlib.sha512(saltedpw).hexdigest()
-
-    #compare and return result
-    if no and rdb.hget('account:' + no, 'password') == encpw:
-        return True
-
-    return False
-
-
-
-########################################################################
-#isLoggedIn - checks to see if the current user is logged into our
-#             system
-#return - Boolean - True if the user is logged in
-########################################################################
-
-def isLoggedIn():
-    if request.get_cookie('account', secret='pass'):
-        return True
-    else:
-        return False
 
 
 
