@@ -46,7 +46,7 @@ install(RedisPlugin())
 #                   'istatus' : istatus
 #
 #   Sets:
-#       accounts:usernames                          // Set of all usernames
+#       accounts:usernames                          // Sorted Set of all usernames
 #       accounts:emails                             // Set of all user emails
 #       account:no:public                           // Set of all public events this account owns
 #       account:no:private                          // Set of all private events this account owns
@@ -125,7 +125,7 @@ def login_submit(rdb):
     password = request.POST.get('password','').strip()
 
     if check_login(rdb, username, password):
-        response.set_cookie('account', username, secret='pass')
+        response.set_cookie('account', username, secret='pass', max_age=600)
         redirect('/userhome')
     else:
         return template('loginfail.tpl', get_url=url, logged_in=False)
@@ -208,7 +208,7 @@ def signup_submit(rdb):
                    'useremail' : useremail, 'username' : username,
                    'password' : encpw, 'salt' : uSalt })
         
-        response.set_cookie('account', username, secret='pass')
+        response.set_cookie('account', username, secret='pass', max_age=600)
         logged_in = True
         return template('userhome.tpl', get_url=url, logged_in=logged_in)
     except:
@@ -311,14 +311,12 @@ def next_id(rdb):
 
 def check_login(rdb, username, password):
     #get user's account number
-    hasaccount = rdb.zrank('accounts:usernames', username)
-    print hasaccount
-    if hasaccount:        
-        no = str(int(rdb.zscore('accounts:usernames', username)))
-        print no
-    else:
+    no = rdb.zscore('accounts:usernames', username)
+    print no
+    if not no:
         return False
 
+    no = str(int(no))
     #get user's salt
     uSalt = rdb.hget('account:' + no, 'salt')
     saltedpw = uSalt + password
