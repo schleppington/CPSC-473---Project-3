@@ -165,7 +165,7 @@ def userhome_route(rdb):
 
 @get('/signup')
 def signup_route():
-    if isLoggedIn():
+    if account.isLoggedIn():
         redirect('/userhome')
     else:
         logged_in = False 
@@ -174,49 +174,15 @@ def signup_route():
 
 
 @post('/signup')
-def signup_submit(rdb):
-    firstname = request.POST.get('first_name','').strip()
-    lastname = request.POST.get('last_name','').strip()
-    useremail = request.POST.get('email_address','').strip()
-    username = request.POST.get('username','').strip()
-    password = request.POST.get('password','').strip()
-
-    #check for username uniqueness
-    if rdb.zscore('accounts:usernames', username):
-        return template('loginfail.tpl', error='User name is already taken', logged_in=False)
-
-    #check for email uniqueness
-    if rdb.sismember('accounts:emails', useremail):
-        return template('loginfail.tpl', error='Email is already in use', logged_in=False)
-
-    logged_in = False
-    try:
-        #get the next available user id number
-        no = str(next_id(rdb))
-
-        #get salt
-        uSalt = str(datetime.datetime.now())
-        saltedpw = uSalt + password
-
-        #encrypt salted password
-        encpw = hashlib.sha512(saltedpw).hexdigest()
-
-        rdb.zadd('accounts:usernames', username, no)
-        rdb.sadd('accounts:emails', useremail)
-
-        rdb.hmset('account:' + no,
-                 { 'firstname' : firstname, 'lastname' : lastname,
-                   'useremail' : useremail, 'username' : username,
-                   'password' : encpw, 'salt' : uSalt })
-        
-        response.set_cookie('account', username, secret='pass', max_age=600)
-        logged_in = True
-        return template('userhome.tpl', get_url=url, logged_in=logged_in)
-    except:
-        #TODO: Create a signup fail template.
-        return template('loginfail.tpl', get_url=url, logged_in=logged_in)
-
-
+def signup_submit(rdb):    
+    result = account.create_account(rdb)
+    print result
+    if result:
+        return template('userhome.tpl', get_url=url, logged_in=result)
+    else:
+        return template('loginfail.tpl', get_url=url, logged_in=result)
+ 
+ 
 
 #@route('/newEvent')
 #def newEvent_route():
@@ -286,19 +252,6 @@ def getUserEventsList(rdb, no, pkey):
 
 
 
-########################################################################
-#next_id - gets the next account number to be used
-#   param - rdb - redis db ojbect passed by plugin
-#   return - int - the next account number that is ready for use
-########################################################################
-
-def next_id(rdb):
-    if rdb.hgetall('account:' + str(rdb.get('no'))) :
-        rdb.incr('no')
-    else:
-        rdb.setnx('no', 1)
-
-    return  rdb.get('no')
 
 
 
