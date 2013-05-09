@@ -179,7 +179,7 @@ def newEvent_submit(rdb):
 
 
 #NOT WORKING ATM, dont know why...
-@route('/event/<user_id:re:\d+>/<event_id:re:\d+>')
+@get('/event/<user_id:re:\d+>/<event_id:re:d+>')
 def show_event(rdb, user_id, event_id):
     return "display event stuff here..."
 #BROKEN LINK =(
