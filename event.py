@@ -5,6 +5,12 @@ from bottle_redis import RedisPlugin
 
 import constants, account
 
+########################################################################
+#create_event - create a new event entry in redis db
+#   param   - rdb - redis db ojbect passed by plugin
+#   return  - touple - (user's id, events id) if creation is successful
+#                      None if creation failed
+########################################################################
 def create_event(rdb):
     try:
         #get incoming fields
@@ -12,16 +18,16 @@ def create_event(rdb):
         eduedate = request.POST.get('datepicker','').strip()
         eventdesc = request.POST.get('event_description','').strip()
         ename = request.POST.get('event_name','').strip()
-        print ename, eventdesc, eduedate, etype
+        #print ename, eventdesc, eduedate, etype
 
         #get current user info
         user = request.get_cookie('account', secret='pass')
         user_id = str(int(rdb.zscore('accounts:usernames', user)))
-        print user, user_id
+        #print user, user_id
 
         #Increment number of user's events, get new value:
         event_id = str(rdb.hincrby('account:' + user_id, 'numevents', 1))
-        print event_id
+        #print event_id
 
         #Add event info to db
         rdb.hmset('event:' + user_id + ':' + event_id,

@@ -41,3 +41,12 @@ def getEventTypeFromStr(e):
     else:
         return EVENT_TYPE_PRIVATE
     
+def getStatusTypeFromStr(s):
+    if s == 'Needs Attention':
+        return STATUS_NEEDS_ATTENTION
+    elif s == 'In Progress':
+        return STATUS_IN_PROGRESS
+    elif s == 'Completed':
+        return STATUS_COMPLETED
+    else:
+        return -1
