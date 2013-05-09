@@ -1,7 +1,7 @@
 %rebase layout.tpl url=get_url, logged_in = logged_in
 <h3>Sign Up</h3>
 Enter your account information.<br/>
-<form action="/signup" method="POST">
+<form action="/newevent" method="POST">
     <p>
         <label for="event_name">Event Name:</label><br/>
         <input type="text" name="event_name" size="30"/><br/>
