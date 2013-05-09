@@ -60,21 +60,78 @@ def create_event(rdb):
 
 
 
+########################################################################
+#create_task - create a new task entry in redis db
+#   param   - rdb - redis db ojbect passed by plugin
+#           - user_id - a string value containing the id number of the
+#                       user
+#           - event_id - a string value containing the id number of the
+#                        event the new task will be referenced to.
+#   return  - task_key - a string containing the task key if creation is
+#                        successful;
+#             None if creation failed
+########################################################################
+def create_task(rdb, user_id, event_id):
+    #Get the task data from the form:
+    #tname = request.POST.get('TODO','').strip()
+    #tinfo = request.POST.get('TODO','').strip()
+    #tcost = request.POST.get('TODO','').strip()
 
-# This will be in create task or something
+    #Increment the current number of tasks in the current event.
+    task_id = str(rdb.hincrby('event:' + user_id + ':' + event_id, 'numtasks', 1))
 
+    #Try to add the new task to the database.
+    try:
+        task_key = 'task:' + user_id + ':' + event_id + ':' + task_id
+        rdb.hmset(task_key,
+                 { 'event' : event_id, 
+                    #'tname' : tname, 
+                    #'tinfo' : tinfo, 
+                    #'tcost' : tcost,
+                    'tstatus' : constants.STATUS_NEEDS_ATTENTION,
+                    'numitems' : 0 })
+        return task_key
+    except:
+        #TODO: error task insertion failed.
+        tno = int(task_id) - 1
+        rdb.hset('event:' + user_id + ':' + event_id, { 'numtasks' : tno } )
+        return None
+
+
+
+########################################################################
+#create_item - create a new item entry in redis db
+#   param   - rdb - redis db ojbect passed by plugin
+#           - user_id - a string value containing the id number of the
+#                       user
+#           - event_id - a string value containing the id number of the
+#                        event the new task item will be referenced to.
+#           - task_id - a string value containing the id number of the
+#                       task the new item will be referenced to.
+#   return  - item_key - a string containing the item key if creation is
+#                        successful;
+#             None if creation failed
+########################################################################
+def create_item(rdb, user_id, event_id, task_id):
+    #Get the item data from the form:
+    #iname = request.POST.get('TODO','').strip()
+    #icost = request.POST.get('TODO','').strip()
+    #inotes = request.POST.get('TODO','').strip()
+
+    #Increment current number of items in the current task.
+    item_id = str(rdb.hincrby('task:' + user_id + ':' + event_id + ':' + task_id, 'numitems',1))
     
-    #Loop to get all event tasks (if any)
-    #Add them to the database:
-    #tno = 1        #Initialize task number to be used in task key
-    #rdb.hmset('task:' + ano + ':' + eno + ':' + tno,
-             #{ 'event' : eno, 'tname' : tname, 'tinfo' : tinfo, 'tcost' : tcost,
-               #'tstatus' : tstatus, 'numitems' : numitems })
-
-        #Loop to get all task items (if any)
-        #Add them to the database:
-        #ino = 1    #initialize item number to be used in item key
-        #rdb.hmset('item:' + ano + ':' + eno + ':' + tno + ':' + ino,
-                #{ 'iname' : iname, 'icost' : icost, 'inotes' : inotes, 'istatus' : istatus })
-
-    
+    #Try to add the new item to the database.
+    try:
+        item_key = 'item:' + user_id + ':' + event_id + ':' + task_id + ':' + item_id
+        rdb.hmset(item_key,
+                 { #'iname' : iname,
+                    #'icost' : icost,
+                    #'inotes' : inotes,
+                    'istatus' : constants.STATUS_NEEDS_ATTENTION })
+        return item_key
+    except:
+        #TODO: error item insertion failed.
+        ino = int(item_id) - 1
+        rdb.hset('task:' + user_id + ':' + event_id + ':' + task_id, { 'numitems' : ino} )
+        return None
