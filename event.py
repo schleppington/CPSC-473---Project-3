@@ -34,7 +34,20 @@ def create_event(rdb):
                     'estatus' : constants.STATUS_NEEDS_ATTENTION,
                     'etype' : constants.getEventTypeFromStr(etype), 
                     'numtasks' : 0 })
-        print (user_id,  event_id)
+        
+        #add event to its respective lists
+        if etype == constants.EVENT_TYPE_PUBLIC:
+            #add event to public list
+            rdb.sadd('events:public', 'event:' + user_id + ':' + event_id)
+            #add event to user's public list
+            rdb.sadd('account:' + user_id + ':public', 'event:' + user_id + ':' + event_id)
+        else:
+            #add even to user's private list
+            rdb.sadd('account:' + user_id + ':private', 'event:' + user_id + ':' + event_id)
+        
+        #add owner to admin list for this event
+        rdb.sadd('eventadmins' + user_id + ':' + event_id, user_id)
+        
         return (user_id,  event_id)
     except:
         return None
