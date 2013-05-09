@@ -40,13 +40,19 @@ def create_account(rdb):
         #encrypt salted password
         encpw = hashlib.sha512(saltedpw).hexdigest()
 
+        #set username and user_id in accounts:usernames
         rdb.zadd('accounts:usernames', username, no)
+        #set email
         rdb.sadd('accounts:emails', useremail)
 
         rdb.hmset('account:' + no,
-                 { 'firstname' : firstname, 'lastname' : lastname,
-                   'useremail' : useremail, 'username' : username,
-                   'password' : encpw, 'salt' : uSalt })
+                 {  'firstname' : firstname, 
+                    'lastname' : lastname,
+                    'useremail' : useremail, 
+                    'username' : username,
+                    'password' : encpw, 
+                    'salt' : uSalt,
+                    'numevents' : 0 })
         
         response.set_cookie('account', username, secret='pass', max_age=600)
         logged_in = True

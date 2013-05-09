@@ -32,3 +32,12 @@ def getEventTypeStrFromInt(num):
         return 'Private'
     else:
         return 'ERROR FETCHING EVENT TYPE STRING FOR: ' + num
+
+def getEventTypeFromStr(e):
+    if e == "public":
+        return EVENT_TYPE_PUBLIC
+    elif e == "private":
+        return EVENT_TYPE_PRIVATE
+    else:
+        return EVENT_TYPE_PRIVATE
+    

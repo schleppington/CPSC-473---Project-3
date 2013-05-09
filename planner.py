@@ -1,9 +1,9 @@
 import sqlite3, sha, time, Cookie, os, datetime, hashlib
-from bottle import get, post, route, debug, run, template, request
+from bottle import get, post, route, debug, run, template, request, validate
 from bottle import static_file, url, response, redirect, install
 from bottle_redis import RedisPlugin
 
-import account
+import account, event
 
 install(RedisPlugin())
 
@@ -14,37 +14,39 @@ install(RedisPlugin())
 #   Hash tables:
 #
 #      Key: account:no
-#       Fields:     'firstname' : firstname,
-#                   'lastname' : lastname,
-#                   'useremail' : useremail, 
-#                   'username' : username,
-#                   'password' : password, 
-#                   'salt' : salt
+#       Fields:     'firstname' : firstname,                str
+#                   'lastname' : lastname,                  str
+#                   'useremail' : useremail,                str
+#                   'username' : username,                  str
+#                   'password' : password,                  str
+#                   'salt' : salt                           str
 #
 #      Key: event:ano:eno
-#       Fields:		'ename' : ename, 
-#                   'eduedate' : eduedate, 
-#                   'eventdesc' : eventdesc,
-#                   'numinvited' : numinvited, 
-#                   'responded' : responded,
-#                   'numattending' : numattending, 
-#                   'public' : True/False,
-#                   'estatus' : 'estatus', 
-#                   'etype' : etype, 
-#                   'numtasks' : numtasks
+#       Fields:		'ename' : ename,                        str
+#                   'eduedate' : eduedate,                  datetime?
+#                   'eventdesc' : eventdesc,                str
+#                   'numinvited' : numinvited,              int
+#                   'responded' : responded,                int
+#                   'numattending' : numattending,          int
+#                   'estatus' : 'estatus',                  int - from constants
+#                   'etype' : etype,                        int - from constants
+#                   'numtasks' : numtasks                   int
+#
+#  --Removed public field from event, not sure what this was for, the 
+#    etype is there to determine public/private
 #
 #      Key: task:ano:eno:tno
-#      Fields:      'tname' : tname, 
-#                   'tinfo' : tinfo, 
-#                   'tcost' : tcost, 
-#                   'tstatus' : tstatus,
-#                   'numitems' : numitems  
+#      Fields:      'tname' : tname,                        str
+#                   'tinfo' : tinfo,                        str
+#                   'tcost' : tcost,                        not sure what this is? money? double?
+#                   'tstatus' : tstatus,                    int - from constatns
+#                   'numitems' : numitems                   int
 #
 #      Key: item:ano:eno:tno:ino
-#      Fields:		'iname' : iname, '
-#                   'icost' : icost, 
-#                   'inotes' : inotes, 
-#                   'istatus' : istatus
+#      Fields:		'iname' : iname,                        str
+#                   'icost' : icost,                        double?
+#                   'inotes' : inotes,                      str
+#                   'istatus' : istatus                     int - from constants
 #
 #   Sets:
 #       accounts:usernames                          // Sorted Set of all usernames
@@ -63,42 +65,12 @@ install(RedisPlugin())
 
 
 ########################################################################
-#                         Constants                         #
-########################################################################
-
-#QUESTION: Would it be easier to store the string value inside the field?
-STATUS_NEEDS_ATTENTION = 0
-STATUS_IN_PROGRESS = 1
-STATUS_COMPLETED = 2
-
-EVENT_TYPE_PUBLIC = 0
-EVENT_TYPE_PRIVATE = 1
-
-def getStatusStrFromInt(num):
-    if num == 0:
-        return 'Needs Attention'
-    elif num == 1:
-        return 'In Progress'
-    elif num == 2:
-        return 'Completed'
-    else:
-        return 'ERROR FETCHING STATUS STRING FOR: ' + num
-
-def getEventTypeStrFromInt(num):
-    if num == 0:
-        return 'Public'
-    elif num == 1:
-        return 'Private'
-    else:
-        return 'ERROR FETCHING EVENT TYPE STRING FOR: ' + num
-
-########################################################################
 #                         View Functions                         #
 ########################################################################
 
 @get('/')
 def default_route():
-    logged_in = isLoggedIn()
+    logged_in = account.isLoggedIn()
 
     return template('default.tpl', get_url=url, logged_in=logged_in)
 
@@ -184,46 +156,33 @@ def signup_submit(rdb):
  
  
 
-#@route('/newEvent')
-#def newEvent_route():
-    #if isLoggedIn():
-        #TODO: Create template for new event, point to that template here insted of 'userhome.tpl'
-        #return template('userhome.tpl', get_url=url, logged_in=logged_in)
-    #else:
-        #redirect('/login')
+@get('/newevent')
+def newEvent_route():
+    logged_in = account.isLoggedIn()
+    if logged_in:
+        return template('newevent.tpl', get_url=url, logged_in=logged_in)
+    else:
+        redirect('/login')
 
 
 
-#@post('/newEvent')
-#def newEvent_submit(rdb):
-    #TODO: Create template for new event, grab info from fields
-    #numtasks = number of tasks created for the event
-    #public = boolean value from form--user decides whether they want the event seen by everyone or not.
-
-    #Increment number of user's events, get new value:
-    #eno = str(rdb.hincrby('account:' + ano, 'numevents', 1))
-    
-    #Add event info to db
-    #rdb.hmset('event:' + ano + ':' + eno,
-             #{ 'ename' : ename, 'eduedate' : eduedate, 'eventdesc' : eventdesc,
-               #'numinvited' : None, 'responded' : None,
-               #'numattending' : None, 'public' : public, 'estatus' : 0,
-               #'etype' : etype, 'numtasks' : numtasks })
-
-    #Loop to get all event tasks (if any)
-    #Add them to the database:
-    #tno = 1        #Initialize task number to be used in task key
-    #rdb.hmset('task:' + ano + ':' + eno + ':' + tno,
-             #{ 'event' : eno, 'tname' : tname, 'tinfo' : tinfo, 'tcost' : tcost,
-               #'tstatus' : tstatus, 'numitems' : numitems })
-
-        #Loop to get all task items (if any)
-        #Add them to the database:
-        #ino = 1    #initialize item number to be used in item key
-        #rdb.hmset('item:' + ano + ':' + eno + ':' + tno + ':' + ino,
-                #{ 'iname' : iname, 'icost' : icost, 'inotes' : inotes, 'istatus' : istatus })
+@post('/newevent')
+def newEvent_submit(rdb):
+    result = event.create_event(rdb)
+#   result = (user_id , event_id)
+    if result:
+        redirect('/event/%s/%s/' % result)
+        #event created
+    else:
+        #failed to create event
+        return "Failed to create event"
 
 
+#NOT WORKING ATM, dont know why...
+@route('/event/<user_id:re:\d+>/<event_id:re:\d+>')
+def show_event(rdb, user_id, event_id):
+    return "display event stuff here..."
+#BROKEN LINK =(
 
 ########################################################################
 #                         Helper Functions                         #
