@@ -179,7 +179,7 @@ def newEvent_submit(rdb):
 
 
 #NOT WORKING ATM, dont know why...
-@get('/event/<user_id:re:\d+>/<event_id:re:d+>')
+@get('/event/<user_id:re:\d+>/<event_id:re:\d+>')
 def show_event(rdb, user_id, event_id):
     return "display event stuff here..."
 #BROKEN LINK =(
@@ -203,16 +203,11 @@ def getUserEventsList(rdb, no, pkey):
     #Use the ID's to retrieve the event information we're looking for
     if event_ids and event_ids != 'None':
         for i in event_ids:
-            info = rdb.hget('event:' + no + ':' + str(i), { 'eventdesc', 'estatus', 'etype', 'eduedate' })
-            info.insert(i)
+            info = rdb.hmget(i, { 'eventdesc', 'estatus', 'etype', 'eduedate' })
+            info.insert(0, i)
             lst.insert(0,  (info))
     
     return lst
-
-
-
-
-
 
 
 
