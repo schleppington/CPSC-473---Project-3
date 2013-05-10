@@ -212,7 +212,7 @@ def show_event(rdb, user_id, event_id):
                         item_info['icost'], 
                         item_info['inotes'], 
                         constants.getStatusStrFromInt(item_info['istatus']) )
-                t[6].insert(0, item)
+                t[7].insert(0, item)
             
             tasks.insert(0,t)
         #return info to template
