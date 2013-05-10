@@ -39,7 +39,7 @@ def create_task(rdb):
                  })
                  
         #update event's task count
-        
+        rdb.hincrby('event:' + user_id + ':' + event_id, 'numtasks', 1)
         
     except:
         return None
