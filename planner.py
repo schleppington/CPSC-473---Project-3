@@ -186,6 +186,8 @@ def show_event(rdb, user_id, event_id):
         #add string versions of constants
         event_info['strestatus'] = constants.getEventTypeStrFromInt(event_info['estatus'])
         event_info['stretype'] = constants.getStatusStrFromInt(event_info['etype'])
+        event_info['user_id'] = user_id
+        event_info['event_id'] = event_id
         
         #get tasks for this event
         num_tasks = int(event_info['numtasks'])
@@ -193,22 +195,24 @@ def show_event(rdb, user_id, event_id):
         for i in range(0,num_tasks):
             #get task
             task_info = rdb.hgetall('task:' + user_id + ':' + event_id + ':' + i)
-            t = (   task_info['event'], 
+            t = (   i,   
+                    task_info['event'], 
                     task_info['tname'], 
                     task_info['tinfo'], 
                     task_info['tcost'], 
-                    task_info['tstatus'], 
+                    constants.getStatusStrFromInt(task_info['tstatus']), 
                     task_info['numitems'], 
                     [])
             #get items for each task
             for j in range(0, int(task_info['numitems'])):
                 #get task
                 item_info = rdb.hgetall('item:' + user_id + ':' + event_id + ':' + i + ':' + j)
-                item = (item_info['iname'], 
+                item = (j,
+                        item_info['iname'], 
                         item_info['icost'], 
                         item_info['inotes'], 
                         constants.getStatusStrFromInt(item_info['istatus']) )
-                t[5].insert(0, item)
+                t[6].insert(0, item)
             
             tasks.insert(0,t)
         #return info to template
