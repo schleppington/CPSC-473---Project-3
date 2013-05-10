@@ -16,6 +16,7 @@ EVENT_TYPE_PUBLIC = 0
 EVENT_TYPE_PRIVATE = 1
 
 def getStatusStrFromInt(num):
+    num = int(num)
     if num == 0:
         return 'Needs Attention'
     elif num == 1:
@@ -26,6 +27,7 @@ def getStatusStrFromInt(num):
         return 'ERROR FETCHING STATUS STRING FOR: ' + num
 
 def getEventTypeStrFromInt(num):
+    num = int(num)
     if num == 0:
         return 'Public'
     elif num == 1:
@@ -41,7 +43,7 @@ def getEventTypeFromStr(e):
     else:
         return EVENT_TYPE_PRIVATE
     
-def getStatusTypeFromStr(s):
+def getStatusIntFromStr(s):
     if s == 'Needs Attention':
         return STATUS_NEEDS_ATTENTION
     elif s == 'In Progress':

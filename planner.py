@@ -3,7 +3,7 @@ from bottle import get, post, route, debug, run, template, request, validate
 from bottle import static_file, url, response, redirect, install
 from bottle_redis import RedisPlugin
 
-import account, event
+import account, event, constants
 
 install(RedisPlugin())
 
@@ -73,12 +73,6 @@ def default_route():
     logged_in = account.isLoggedIn()
 
     return template('default.tpl', get_url=url, logged_in=logged_in)
-
-
-
-@get('/:path#.+#', name='static')
-def static(path):
-    return static_file(path, root='')
 
 
 
@@ -178,11 +172,57 @@ def newEvent_submit(rdb):
         return "Failed to create event"
 
 
-#NOT WORKING ATM, dont know why...
+
 @get('/event/<user_id:re:\d+>/<event_id:re:\d+>')
 def show_event(rdb, user_id, event_id):
-    return "display event stuff here..."
-#BROKEN LINK =(
+    
+    logged_in = account.isLoggedIn()
+    if logged_in:
+        redirect('/userhome')
+    else:
+        #get event info
+        event_info = rdb.hgetall('event:' + user_id + ':' + event_id)
+        
+        #add string versions of constants
+        event_info['strestatus'] = constants.getEventTypeStrFromInt(event_info['estatus'])
+        event_info['stretype'] = constants.getStatusStrFromInt(event_info['etype'])
+        
+        #get tasks for this event
+        num_tasks = int(event_info['numtasks'])
+        tasks = []
+        for i in range(0,num_tasks):
+            #get task
+            task_info = rdb.hgetall('task:' + user_id + ':' + event_id + ':' + i)
+            t = (   task_info['event'], 
+                    task_info['tname'], 
+                    task_info['tinfo'], 
+                    task_info['tcost'], 
+                    task_info['tstatus'], 
+                    task_info['numitems'], 
+                    [])
+            #get items for each task
+            for j in range(0, int(task_info['numitems'])):
+                #get task
+                item_info = rdb.hgetall('item:' + user_id + ':' + event_id + ':' + i + ':' + j)
+                item = (item_info['iname'], 
+                        item_info['icost'], 
+                        item_info['inotes'], 
+                        constants.getStatusStrFromInt(item_info['istatus']) )
+                t[5].insert(0, item)
+            
+            tasks.insert(0,t)
+        #return info to template
+        event_info['tasks'] = tasks
+        
+        #TODO: create template to display event info
+        return event_info
+
+
+
+@get('/:path#.+#', name='static')
+def static(path):
+    return static_file(path, root='')
+
 
 ########################################################################
 #                         Helper Functions                         #
