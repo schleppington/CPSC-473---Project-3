@@ -3,7 +3,7 @@ from bottle import get, post, route, debug, run, template, request, validate
 from bottle import static_file, url, response, redirect, install
 from bottle_redis import RedisPlugin
 
-import account, event
+import account, event, constants
 
 install(RedisPlugin())
 
@@ -73,12 +73,6 @@ def default_route():
     logged_in = account.isLoggedIn()
 
     return template('default.tpl', get_url=url, logged_in=logged_in)
-
-
-
-@get('/:path#.+#', name='static')
-def static(path):
-    return static_file(path, root='')
 
 
 
@@ -178,11 +172,34 @@ def newEvent_submit(rdb):
         return "Failed to create event"
 
 
-#NOT WORKING ATM, dont know why...
+
 @get('/event/<user_id:re:\d+>/<event_id:re:\d+>')
 def show_event(rdb, user_id, event_id):
-    return "display event stuff here..."
-#BROKEN LINK =(
+    
+    logged_in = account.isLoggedIn()
+    if logged_in:
+        redirect('/userhome')
+    else:
+        #get event info
+        event_info = rdb.hgetall('event:' + user_id + ':' + event_id)
+        
+        #add string versions of constants
+        event_info['strestatus'] = constants.getEventTypeStrFromInt(event_info['estatus'])
+        event_info['stretype'] = constants.getStatusStrFromInt(event_info['etype'])
+        
+        #get tasks for this event
+        
+        #get items for each task
+        
+        #return info to template
+    return event_info
+
+
+
+@get('/:path#.+#', name='static')
+def static(path):
+    return static_file(path, root='')
+
 
 ########################################################################
 #                         Helper Functions                         #
