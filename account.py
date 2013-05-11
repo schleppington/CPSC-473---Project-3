@@ -11,6 +11,7 @@ from bottle_redis import RedisPlugin
 #   param - rdb - redis db ojbect passed by plugin
 #   return - boolean - True if the account was successfully created
 ########################################################################
+
 def create_account(rdb):
     firstname = request.POST.get('first_name','').strip()
     lastname = request.POST.get('last_name','').strip()
@@ -63,6 +64,74 @@ def create_account(rdb):
         #response.delete_cookie('account', secret='pass')
         return False
     return logged_in
+
+
+########################################################################
+#modify_account - updates the database with the user's new information.
+#   param - rdb - redis db object passed by plugin
+#   return - Boolean - True if update was successful; False otherwise.
+########################################################################
+
+def modify_account(rdb):
+    firstname = request.POST.get('first_name','').strip()
+    lastname = request.POST.get('last_name','').strip()
+    useremail = request.POST.get('email_address','').strip()
+    password = request.POST.get('password','').strip()
+
+    #Get user's username and id
+    user = request.get_cookie('account', secret='pass')
+    user_id = str(int(rdb.zscore('accounts:usernames', user)))
+
+    try:
+        #Modify user's info:
+        if firstname and len(firstname):
+            rdb.hset('account:' + user_id, 'firstname', firstname)
+
+        if lastname and len(lastname) > 0:
+            rdb.hset('account:' + user_id, 'lastname', lastname)
+
+        if useremail and len(useremail) > 0:
+            old = rdb.hget('account:' + user_id, 'useremail')
+            rdb.srem('accounts:emails', old)
+            rdb.sadd('accounts:emails', useremail)
+            rdb.hset('account:' + user_id, 'useremail', useremail)
+
+        if password and len(password) > 0:
+            #Get salt
+            salt = rdb.hget('account:' + user_id, 'salt')
+            saltedpw = salt + password
+
+            #encrypt salted password
+            encpw = hashlib.sha512(saltedpw).hexdigest()
+            rdb.hset('account:' + user_id, 'password', password)
+        return True
+    except:
+        return False
+
+
+
+########################################################################
+# getUserModInfo - retrieves user's modifiable account information
+#   param - rdb - redis db object passed by plugin
+#   return - result - an array containing the user's first name, last
+#                     name and email address
+########################################################################
+
+def getUserModInfo(rdb):
+    #Get user's username and id
+    user = request.get_cookie('account', secret='pass')
+    user_id = str(int(rdb.zscore('accounts:usernames', user)))
+
+    #For some reason, the results of
+    #rdb.hmget('account:' + user_id, { 'firstname', 'lastname', 'useremail' })
+    #are ordered incorrectly ('firstname', 'useremail', 'lastname'). Used
+    #the following workaround:
+    result = []
+    result.insert(0, rdb.hget('account:' + user_id, 'firstname'))
+    result.insert(1,rdb.hget('account:' + user_id, 'lastname'))
+    result.insert(2,rdb.hget('account:' + user_id, 'useremail'))
+    return result
+
 
 
 ########################################################################

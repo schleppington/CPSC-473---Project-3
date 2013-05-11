@@ -143,6 +143,29 @@ def signup_submit(rdb):
         return template('loginfail.tpl', get_url=url, logged_in=result)
 
 
+
+@get('/modifyacct')
+def modifyacct_route(rdb):
+    logged_in = account.isLoggedIn()
+    if logged_in:
+        info = account.getUserModInfo(rdb)
+        return template('modifyacct.tpl', get_url=url, logged_in=logged_in, acct=info)
+    else:
+        redirect('/login')
+
+
+
+@post('/modifyacct')
+def modifyacct_submit(rdb):
+    result = account.modify_account(rdb)
+    print result
+    if result:
+        return template('userhome.tpl', get_url=url, logged_in=result)
+    else:
+        return "Failed to modify account."
+
+
+
 @get('/newevent')
 def newEvent_route():
     logged_in = account.isLoggedIn()
