@@ -32,7 +32,7 @@ install(RedisPlugin())
 #                   'etype' : etype,                        int - from constants
 #                   'numtasks' : numtasks                   int
 #
-#  --Removed public field from event, not sure what this was for, the 
+#  --Removed public field from event, not sure what this was for, the
 #    etype is there to determine public/private
 #
 #      Key: task:ano:eno:tno
@@ -71,7 +71,7 @@ install(RedisPlugin())
 @get('/')
 def default_route():
     logged_in = account.isLoggedIn()
-
+    
     return template('default.tpl', get_url=url, logged_in=logged_in)
 
 
@@ -90,7 +90,7 @@ def login_route():
 def login_submit(rdb):
     username = request.POST.get('username','').strip()
     password = request.POST.get('password','').strip()
-
+    
     if account.check_login(rdb, username, password):
         response.set_cookie('account', username, secret='pass', max_age=600)
         redirect('/userhome')
@@ -109,23 +109,23 @@ def logout_route():
 
 @route('/userhome')
 def userhome_route(rdb):
-   if account.isLoggedIn():
-       user = request.get_cookie('account', secret='pass')
-       user_id = str(int(rdb.zscore('accounts:usernames', user)))
-
-       #get list of private events for current user
-       lstprivates = getUserEventsList(rdb, user_id, 'private')
-
-       #get list of invited to events for current user
-       lstinvited = getUserEventsList(rdb, user_id, 'invited')
-
-       #get list of public events for current user
-       lstpublics = getUserEventsList(rdb, user_id, 'public')
-
-       return template('userhome.tpl',public_events=lstpublics,private_events=lstprivates,
+    if account.isLoggedIn():
+        user = request.get_cookie('account', secret='pass')
+        user_id = str(int(rdb.zscore('accounts:usernames', user)))
+        
+        #get list of private events for current user
+        lstprivates = getUserEventsList(rdb, user_id, 'private')
+        
+        #get list of invited to events for current user
+        lstinvited = getUserEventsList(rdb, user_id, 'invited')
+        
+        #get list of public events for current user
+        lstpublics = getUserEventsList(rdb, user_id, 'public')
+        
+        return template('userhome.tpl',public_events=lstpublics,private_events=lstprivates,
                         invited_events=lstinvited, get_url=url, logged_in=True)
-   else:
-       redirect('/login')
+    else:
+        redirect('/login')
 
 
 
@@ -134,21 +134,21 @@ def signup_route():
     if account.isLoggedIn():
         redirect('/userhome')
     else:
-        logged_in = False 
+        logged_in = False
         return template('signup.tpl', get_url=url, logged_in=logged_in)
 
 
 
 @post('/signup')
-def signup_submit(rdb):    
+def signup_submit(rdb):
     result = account.create_account(rdb)
     print result
     if result:
         return template('userhome.tpl', get_url=url, logged_in=result)
     else:
         return template('loginfail.tpl', get_url=url, logged_in=result)
- 
- 
+
+
 
 @get('/newevent')
 def newEvent_route():
@@ -163,10 +163,10 @@ def newEvent_route():
 @post('/newevent')
 def newEvent_submit(rdb):
     result = event.create_event(rdb)
-#   result = (user_id , event_id)
+    #   result = (user_id , event_id)
     if result:
         redirect('/event/%s/%s/' % result)
-        #event created
+    #event created
     else:
         #failed to create event
         return "Failed to create event"
@@ -177,9 +177,7 @@ def newEvent_submit(rdb):
 def show_event(rdb, user_id, event_id):
     
     logged_in = account.isLoggedIn()
-    if logged_in:
-        redirect('/userhome')
-    else:
+    if logged_in:    #switched
         #get event info
         event_info = rdb.hgetall('event:' + user_id + ':' + event_id)
         
@@ -195,32 +193,34 @@ def show_event(rdb, user_id, event_id):
         for i in range(0,num_tasks):
             #get task
             task_info = rdb.hgetall('task:' + user_id + ':' + event_id + ':' + i)
-            t = (   i,   
-                    task_info['event'], 
-                    task_info['tname'], 
-                    task_info['tinfo'], 
-                    task_info['tcost'], 
-                    constants.getStatusStrFromInt(task_info['tstatus']), 
-                    task_info['numitems'], 
-                    [])
+            t = (   i,
+                 task_info['event'],
+                 task_info['tname'],
+                 task_info['tinfo'],
+                 task_info['tcost'],
+                 constants.getStatusStrFromInt(task_info['tstatus']),
+                 task_info['numitems'],
+                 [])
             #get items for each task
             for j in range(0, int(task_info['numitems'])):
                 #get task
                 item_info = rdb.hgetall('item:' + user_id + ':' + event_id + ':' + i + ':' + j)
                 item = (j,
-                        item_info['iname'], 
-                        item_info['icost'], 
-                        item_info['inotes'], 
+                        item_info['iname'],
+                        item_info['icost'],
+                        item_info['inotes'],
                         constants.getStatusStrFromInt(item_info['istatus']) )
                 t[7].insert(0, item)
             
             tasks.insert(0,t)
-        #return info to template
-        event_info['tasks'] = tasks
+            #return info to template
+            event_info['tasks'] = tasks
         
         #TODO: create template to display event info
-        return event_info
-
+        return template('event.tpl', get_url=url, logged_in=logged_in, row=event_info)
+    
+    else:
+        redirect('/userhome')
 
 
 @get('/:path#.+#', name='static')
