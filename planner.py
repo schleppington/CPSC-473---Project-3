@@ -75,7 +75,6 @@ def default_route():
     return template('default.tpl', get_url=url, logged_in=logged_in)
 
 
-
 @get('/login')
 def login_route():
     logged_in = account.isLoggedIn()
@@ -83,7 +82,6 @@ def login_route():
         redirect('/userhome')
     else:
         return template('login.tpl', get_url=url, logged_in=logged_in)
-
 
 
 @post('/login')
@@ -98,13 +96,11 @@ def login_submit(rdb):
         return template('loginfail.tpl', get_url=url, logged_in=False)
 
 
-
 @get('/logout')
 def logout_route():
     if account.isLoggedIn():
         response.delete_cookie('account', secret='pass')
     redirect('/login')
-
 
 
 @route('/userhome')
@@ -128,7 +124,6 @@ def userhome_route(rdb):
         redirect('/login')
 
 
-
 @get('/signup')
 def signup_route():
     if account.isLoggedIn():
@@ -136,7 +131,6 @@ def signup_route():
     else:
         logged_in = False
         return template('signup.tpl', get_url=url, logged_in=logged_in)
-
 
 
 @post('/signup')
@@ -149,7 +143,6 @@ def signup_submit(rdb):
         return template('loginfail.tpl', get_url=url, logged_in=result)
 
 
-
 @get('/newevent')
 def newEvent_route():
     logged_in = account.isLoggedIn()
@@ -157,7 +150,6 @@ def newEvent_route():
         return template('newevent.tpl', get_url=url, logged_in=logged_in)
     else:
         redirect('/login')
-
 
 
 @post('/newevent')
@@ -170,7 +162,6 @@ def newEvent_submit(rdb):
     else:
         #failed to create event
         return "Failed to create event"
-
 
 
 @get('/event/<user_id:re:\d+>/<event_id:re:\d+>')
@@ -222,6 +213,30 @@ def show_event(rdb, user_id, event_id):
     else:
         redirect('/userhome')
 
+
+# INCOMPLETE
+@get('/delevent/<user_id:re:\d+>/<event_id:re:\d+>')
+def delete_event(rdb, user_id, event_id):
+    #ensure this event is owned by the current user
+    user = request.get_cookie('account', secret='pass')
+    cur_user_id = str(int(rdb.zscore('accounts:usernames', user)))
+    if cur_user_id != user_id:
+        return "Access Denied!"
+        
+    numtasks = rdb.hget('event:' + user_id + ':' + event_id, 'numtasks')
+    
+    #get all tasks for this event
+    for i in range(0, numtasks):
+        #get all items for this task and delete
+        numitems = rdb.hget('task:' + user_id + ':' + event_id + ':' + i)
+        for j in range(o, numitems):
+            rdb.delete('item:' + user_id + ':' + event_id + ':' + i + ':' + j)
+        rdb.delete('task:' + user_id + ':' + event_id + ':' + i)
+    #delete the event
+    rdb.delete('event:' + user_id + ':' + event_id)
+    
+    if rdb.sismember('events:public', 'event:' + user_id + ':' + event_id):
+        rdb.srem('event:' + user_id + ':' + event_id)
 
 @get('/:path#.+#', name='static')
 def static(path):
