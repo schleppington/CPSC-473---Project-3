@@ -15,5 +15,4 @@ TODO:
       . Events
       . Tasks
       . Items
-  - Finish Account (Backend & Frontend):
-    . Modify (Christina is working on this today)
+  - Finish Account (Polish Front-end for modify portion)
