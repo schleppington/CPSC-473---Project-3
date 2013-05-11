@@ -237,6 +237,10 @@ def delete_event(rdb, user_id, event_id):
     
     if rdb.sismember('events:public', 'event:' + user_id + ':' + event_id):
         rdb.srem('event:' + user_id + ':' + event_id)
+        
+    #TODO: delete items from the other sets here
+    return redirect('/userhome')
+    
 
 @get('/:path#.+#', name='static')
 def static(path):
