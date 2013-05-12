@@ -143,7 +143,6 @@ def signup_submit(rdb):
         return template('loginfail.tpl', get_url=url, logged_in=result)
 
 
-
 @get('/modifyacct')
 def modifyacct_route(rdb):
     logged_in = account.isLoggedIn()
@@ -154,7 +153,6 @@ def modifyacct_route(rdb):
         redirect('/login')
 
 
-
 @post('/modifyacct')
 def modifyacct_submit(rdb):
     result = account.modify_account(rdb)
@@ -163,7 +161,6 @@ def modifyacct_submit(rdb):
         return template('userhome.tpl', get_url=url, logged_in=result)
     else:
         return "Failed to modify account."
-
 
 
 @get('/newevent')
@@ -193,7 +190,7 @@ def show_event(rdb, user_id, event_id):
     logged_in = account.isLoggedIn()
     if logged_in:    #switched
         #get event info
-        event_info = rdb.hgetall('event:' + user_id + ':' + event_id)
+        event_info = rdb.hgetall('event:' + str(user_id) + ':' + str(event_id))
         
         #add string versions of constants
         event_info['strestatus'] = constants.getEventTypeStrFromInt(event_info['estatus'])
@@ -202,13 +199,12 @@ def show_event(rdb, user_id, event_id):
         event_info['event_id'] = event_id
         
         #get tasks for this event
-        num_tasks = int(event_info['numtasks'])
         tasks = []
-        for i in range(0,num_tasks):
+        for i in range(1, int(event_info['numtasks'])):
             #get task
-            task_info = rdb.hgetall('task:' + user_id + ':' + event_id + ':' + i)
+            task_info = rdb.hgetall('task:' + str(user_id) + ':' + str(event_id) + ':' + str(i))
+            print task_info
             t = (   i,
-                 task_info['event'],
                  task_info['tname'],
                  task_info['tinfo'],
                  task_info['tcost'],
@@ -216,9 +212,9 @@ def show_event(rdb, user_id, event_id):
                  task_info['numitems'],
                  [])
             #get items for each task
-            for j in range(0, int(task_info['numitems'])):
+            for j in range(1, int(task_info['numitems'])):
                 #get task
-                item_info = rdb.hgetall('item:' + user_id + ':' + event_id + ':' + i + ':' + j)
+                item_info = rdb.hgetall('item:' + str(user_id) + ':' + str(event_id) + ':' + str(i) + ':' + str(j))
                 item = (j,
                         item_info['iname'],
                         item_info['icost'],
@@ -303,7 +299,6 @@ def getUserEventsList(rdb, no, pkey):
             lst.insert(0,  (info))
     
     return lst
-
 
 
 debug(True)
