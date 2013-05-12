@@ -30,7 +30,6 @@ def create_item(rdb):
     #Create new item_id
     item_id = int(rdb.hget('task:' + user_id + ':' + event_id + ':' + task_id, 'numitems')) + 1
 
-
     item_key = 'item:%s:%s:%s' % (user_id, event_id, task_id, item_id)
 
     #Try to add the new item to the database.
