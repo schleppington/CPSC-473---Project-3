@@ -1,6 +1,6 @@
 %rebase layout.tpl url=get_url, logged_in = logged_in
-<h3>Sign Up</h3>
-Enter your account information.<br/>
+<h3>New Event</h3>
+Enter Your Event's Details:<br/>
 <form action="/newevent" method="POST">
     <p>
         <label for="event_name">Event Name:</label><br/>
@@ -19,6 +19,14 @@ Enter your account information.<br/>
         <select name="visibility">
             <option value="private">Private</option>
             <option value="public">Public</option>
+        </select>
+    </p>
+    <p>
+        <label for="status">Event Status:</label><br/>
+        <select name="status">
+            <option value="'Needs Attention">Needs Attention</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">In Progress</option>
         </select>
     </p>
     <p>
