@@ -262,7 +262,7 @@ def delete_event(rdb, user_id, event_id):
 
 
 @get('/newtask')
-def newEvent_route():
+def newTask_route():
     logged_in = account.isLoggedIn()
     if logged_in:
         return template('newtask.tpl', get_url=url, logged_in=logged_in)
@@ -271,7 +271,7 @@ def newEvent_route():
 
 
 @post('/newtask')
-def newEvent_submit(rdb):
+def newTask_submit(rdb):
     result = task.create_task(rdb)
     #   result = (user_id , event_id)
     if result:
@@ -285,7 +285,7 @@ def newEvent_submit(rdb):
 
 
 @get('/newitem')
-def newEvent_route():
+def newItem_route():
     logged_in = account.isLoggedIn()
     if logged_in:
         return template('newitem.tpl', get_url=url, logged_in=logged_in)
@@ -294,7 +294,7 @@ def newEvent_route():
 
 
 @post('/newitem')
-def newEvent_submit(rdb):
+def newItem_submit(rdb):
     result = item.create_item(rdb)
     #   result = (user_id , event_id)
     if result:
