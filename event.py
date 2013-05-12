@@ -15,6 +15,7 @@ def create_event(rdb):
     try:
         #get incoming fields
         etype = request.POST.get('visibility','').strip()
+        estatus = request.POST.get('status','').strip()
         eduedate = request.POST.get('datepicker','').strip()
         eventdesc = request.POST.get('event_description','').strip()
         ename = request.POST.get('event_name','').strip()
@@ -37,7 +38,7 @@ def create_event(rdb):
                     'numinvited' : 0, 
                     'responded' : 0,
                     'numattending' : 1,
-                    'estatus' : constants.STATUS_NEEDS_ATTENTION,
+                    'estatus' : constants.getStatusIntFromStr(estatus),
                     'etype' : constants.getEventTypeFromStr(etype), 
                     'numtasks' : 0 })
         
