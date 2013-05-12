@@ -26,8 +26,11 @@ def create_task(rdb):
         #get current user info
         user = request.get_cookie('account', secret='pass')
         user_id = str(int(rdb.zscore('accounts:usernames', user)))
-        
-        task_key = 'task:%s:%s:%s' % (user_id,event_id, task_id)
+
+        #Increment numtasks to get new task_id
+        task_id = int(rdb.hget('event:' + user_id + ':' + event_id, 'numtasks')) + 1
+
+        task_key = 'task:%s:%s:%s' % (user_id, event_id, str(task_id))
         
         #Add event info to db
         rdb.hmset(task_key,
