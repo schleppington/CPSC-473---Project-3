@@ -259,6 +259,52 @@ def delete_event(rdb, user_id, event_id):
         
     #TODO: delete items from the other sets here
     return redirect('/userhome')
+
+
+@get('/newtask')
+def newTask_route():
+    logged_in = account.isLoggedIn()
+    if logged_in:
+        return template('newtask.tpl', get_url=url, logged_in=logged_in)
+    else:
+        redirect('/login')
+
+
+@post('/newtask')
+def newTask_submit(rdb):
+    result = task.create_task(rdb)
+    #   result = (user_id , event_id)
+    if result:
+        #Where to redirect? show_task or show_event?
+        #Currently redirect to show_event
+        redirect('/event/%s/%s/' % result)
+    #task created
+    else:
+        #failed to create event
+        return "Failed to add task"
+
+
+@get('/newitem')
+def newItem_route():
+    logged_in = account.isLoggedIn()
+    if logged_in:
+        return template('newitem.tpl', get_url=url, logged_in=logged_in)
+    else:
+        redirect('/login')
+
+
+@post('/newitem')
+def newItem_submit(rdb):
+    result = item.create_item(rdb)
+    #   result = (user_id , event_id)
+    if result:
+        #Where to redirect? show_item, show_task, or show_event?
+        #Currently redirect to show_event
+        redirect('/event/%s/%s/' % result)
+    #item created
+    else:
+        #failed to create event
+        return "Failed to add item"
     
 
 @get('/:path#.+#', name='static')
