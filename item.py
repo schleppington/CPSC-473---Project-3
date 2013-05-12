@@ -53,4 +53,4 @@ def create_item(rdb):
         #rdb.hset('task:' + user_id + ':' + event_id + ':' + task_id, { 'numitems' : ino} )
         return None
 
-return item_key
+    return (user_id,  event_id)
