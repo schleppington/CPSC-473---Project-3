@@ -44,4 +44,4 @@ def create_task(rdb):
     except:
         return None
     
-    return None
+    return (user_id,  event_id)
