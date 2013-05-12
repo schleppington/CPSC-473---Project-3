@@ -21,7 +21,7 @@ def create_item(rdb):
     iname = request.POST.get('item_name','').strip()
     icost = request.POST.get('item_cost','').strip()
     inotes = request.POST.get('item_notes','').strip()
-    istatus = request.POST.get('status','').strip()
+    istatus = request.POST.get('item_status','').strip()
 
     #get current user info
     user = request.get_cookie('account', secret='pass')
