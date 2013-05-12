@@ -16,8 +16,8 @@ Enter The Item's Details<br/>
         <input type="text" name="item_cost"/>
     </p>
     <p>
-        <label for="status">Event Status:</label><br/>
-        <select name="status">
+        <label for="item_status">Event Status:</label><br/>
+        <select name="item_status">
             <option value="'Needs Attention">Needs Attention</option>
             <option value="In Progress">In Progress</option>
             <option value="Completed">In Progress</option>
