@@ -42,7 +42,7 @@ def create_event(rdb):
                     'numtasks' : 0 })
         
         #add event to its respective lists
-        if etype == constants.EVENT_TYPE_PUBLIC:
+        if constants.getEventTypeFromStr(etype) == constants.EVENT_TYPE_PUBLIC:
             #add event to public list
             rdb.sadd('events:public', 'event:' + user_id + ':' + event_id)
             #add event to user's public list

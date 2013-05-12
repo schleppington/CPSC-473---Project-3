@@ -23,7 +23,7 @@ install(RedisPlugin())
 #
 #      Key: event:ano:eno
 #       Fields:		'ename' : ename,                        str
-#                   'eduedate' : eduedate,                  datetime?
+#                   'eduedate' : eduedate,                  datetime
 #                   'eventdesc' : eventdesc,                str
 #                   'numinvited' : numinvited,              int
 #                   'responded' : responded,                int
@@ -38,13 +38,13 @@ install(RedisPlugin())
 #      Key: task:ano:eno:tno
 #      Fields:      'tname' : tname,                        str
 #                   'tinfo' : tinfo,                        str
-#                   'tcost' : tcost,                        not sure what this is? money? double?
+#                   'tcost' : tcost,                        double
 #                   'tstatus' : tstatus,                    int - from constatns
 #                   'numitems' : numitems                   int
 #
 #      Key: item:ano:eno:tno:ino
 #      Fields:		'iname' : iname,                        str
-#                   'icost' : icost,                        double?
+#                   'icost' : icost,                        double
 #                   'inotes' : inotes,                      str
 #                   'istatus' : istatus                     int - from constants
 #
@@ -283,14 +283,23 @@ def static(path):
 ########################################################################
 
 def getUserEventsList(rdb, no, pkey):
+    print "getUserEventsList entered"
+    print pkey
     lst = []
     event_ids = rdb.smembers('account:' + no + ':' + pkey)
+    print event_ids
     
     #Use the ID's to retrieve the event information we're looking for
     if event_ids and event_ids != 'None':
         for i in event_ids:
-            info = rdb.hmget(i, { 'eventdesc', 'estatus', 'etype', 'eduedate' })
+            info = []
             info.insert(0, i)
+            #inserting each field individually to make sure order is as expected.
+            info.insert(1, rdb.hget(i, 'ename'))
+            info.insert(2, rdb.hget(i, 'eventdesc'))
+            info.insert(3, rdb.hget(i, 'estatus'))
+            info.insert(4, rdb.hget(i, 'etype'))
+            info.insert(5, rdb.hget(i, 'eduedate'))
             lst.insert(0,  (info))
     
     return lst
