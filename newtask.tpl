@@ -16,8 +16,8 @@ Enter The Task's Details<br/>
         <input type="text" name="task_cost"/>
     </p>
     <p>
-        <label for="status">Event Status:</label><br/>
-        <select name="status">
+        <label for="task_status">Event Status:</label><br/>
+        <select name="task_status">
             <option value="'Needs Attention">Needs Attention</option>
             <option value="In Progress">In Progress</option>
             <option value="Completed">In Progress</option>
