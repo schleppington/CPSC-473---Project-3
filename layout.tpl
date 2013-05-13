@@ -8,13 +8,18 @@
     <div class="header">
         <h1>Welcome To Event Planner</h1>
         <p>
-            <a href="/">Home</a>&nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="/">Home</a>
             %if not logged_in:
-            <a href="/login">Login</a>&nbsp;&nbsp;&nbsp;&nbsp;
-            <a href="/signup">Sign Up</a>&nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="/login">Login</a>
+            <a href="/signup">Sign Up</a>
             %else:
-            <a href="/userhome">My Account</a>&nbsp;&nbsp;&nbsp;&nbsp;
-            <a href="/logout">Logout</a>&nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="/modifyacct">Modify Account</a>
+            <a href="/inviteuser">Invite User</a>
+            <a href="/newevent">New Event</a>
+            <a href="/newtask">New Task</a>
+            <a href="/newitem">New Item</a>
+            <a href="/userhome">My Account</a>
+            <a href="/logout">Logout</a>
             %end
         </p>
     </div>
