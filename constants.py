@@ -1,4 +1,3 @@
-
 ########################################################################
 #                         Constants                         #
 ########################################################################
@@ -24,7 +23,7 @@ def getStatusStrFromInt(num):
     elif num == 2:
         return 'Completed'
     else:
-        return 'ERROR FETCHING STATUS STRING FOR: ' + num
+        return 'ERROR FETCHING STATUS STRING FOR: ' + str(num)
 
 def getEventTypeStrFromInt(num):
     num = int(num)
@@ -33,7 +32,7 @@ def getEventTypeStrFromInt(num):
     elif num == 1:
         return 'Private'
     else:
-        return 'ERROR FETCHING EVENT TYPE STRING FOR: ' + num
+        return 'ERROR FETCHING EVENT TYPE STRING FOR: ' + str(num)
 
 def getEventTypeFromStr(e):
     if e == "public":

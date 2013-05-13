@@ -24,7 +24,7 @@ Enter Your Event's Details:<br/>
     <p>
         <label for="status">Event Status:</label><br/>
         <select name="status">
-            <option value="'Needs Attention">Needs Attention</option>
+            <option value="Needs Attention">Needs Attention</option>
             <option value="In Progress">In Progress</option>
             <option value="Completed">In Progress</option>
         </select>
