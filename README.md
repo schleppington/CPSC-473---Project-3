@@ -5,7 +5,7 @@ A Event Planning/To-do list site created using Bottle
 
 TODO:
   - Calendar view
-  - Implement Ajax
+  - Implement Ajax for Calendar view
   - Finish Event (Backend & Frontend):
     . Delete
       . Events
