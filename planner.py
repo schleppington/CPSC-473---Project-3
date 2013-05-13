@@ -102,8 +102,8 @@ def logout_route():
         response.delete_cookie('account', secret='pass')
     redirect('/login')
 
-
-@route('/userhome')
+@post('/userhome')
+@get('/userhome')
 def userhome_route(rdb):
     if account.isLoggedIn():
         user = request.get_cookie('account', secret='pass')
@@ -122,6 +122,7 @@ def userhome_route(rdb):
                         invited_events=lstinvited, get_url=url, logged_in=True)
     else:
         redirect('/login')
+        
 
 
 @get('/signup')
@@ -183,7 +184,7 @@ def newEvent_submit(rdb):
         #failed to create event
         return "Failed to create event"
 
-
+@post('/event/<user_id:re:\d+>/<event_id:re:\d+>')
 @get('/event/<user_id:re:\d+>/<event_id:re:\d+>')
 def show_event(rdb, user_id, event_id):
     
@@ -310,6 +311,11 @@ def newItem_submit(rdb):
 @get('/:path#.+#', name='static')
 def static(path):
     return static_file(path, root='')
+    
+
+@get('/ajax.js')
+def js():
+    return static_file('ajax.js', root='')
 
 
 ########################################################################
