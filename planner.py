@@ -138,7 +138,7 @@ def signup_submit(rdb):
     result = account.create_account(rdb)
     print result
     if result:
-        return template('userhome.tpl', get_url=url, logged_in=result)
+        redirect('/userhome')
     else:
         return template('loginfail.tpl', get_url=url, logged_in=result)
 
