@@ -19,17 +19,40 @@ a:active {
 .header {
     background-color:#FF6600;
     padding:10px;
-    color:#000066
+    color:#000066;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius:5px;
+    box-shadow: 0px 5px 5px #888888;
+    
+}
+.header A{
+	margin:10px;
 }
 .footer {
     text-align:center;
     background-color:#000066;
     padding:10px;
-    color:#FF6600
+    color:#FF6600;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius:5px;
+    box-shadow: 0px 5px 5px #888888;
 }
 .content {
     padding:10px;
     min-height:500px;
+    border-right: 1px solid grey;
+    border-left: 1px solid grey;
+}
+#events div
+{
+	margin:10px 80px 10px 10px;
+	float:left;
+}
+.list_item
+{
+	background:lightgrey;
 }
 .special {
     color:#FFFFFF;
