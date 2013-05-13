@@ -177,7 +177,7 @@ def newEvent_submit(rdb):
     result = event.create_event(rdb)
     #   result = (user_id , event_id)
     if result:
-        redirect('/event/%s/%s/' % result)
+        redirect('/event/%s/%s' % result)
     #event created
     else:
         #failed to create event
