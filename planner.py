@@ -3,7 +3,7 @@ from bottle import get, post, route, debug, run, template, request, validate
 from bottle import static_file, url, response, redirect, install
 from bottle_redis import RedisPlugin
 
-import account, event, constants, task
+import account, event, constants, task, item
 
 install(RedisPlugin())
 
@@ -143,7 +143,6 @@ def userhome_ajax(rdb):
                         invited_events=lstinvited, get_url=url, logged_in=True)
 
 
-
 @get('/signup')
 def signup_route():
     if account.isLoggedIn():
@@ -252,6 +251,31 @@ def show_event(rdb, user_id, event_id):
     
     else:
         redirect('/userhome')
+
+
+@get('/task/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>')
+def show_task(rdb, user_id, event_id, task_id):
+    logged_in = account.isLoggedIn()
+    if logged_in:
+        #todo: make sure user has access to this event
+        
+        #get task info        
+        task_info = rdb.hgetall('task:' + str(user_id) + ':' + str(event_id) + ':' + str(task_id))
+        task_info['strtstatus'] = constants.getStatusStrFromInt(task_info['tstatus'])
+        #get items for this task
+        items = []
+        for i in rdb.smembers('itemids:' + str(user_id) + ':' + str(event_id) + ':' + str(task_id)):
+            item_info = rdb.hgetall('item:' + str(user_id) + ':' + str(event_id) + ':' + str(task_id) + ':' + str(i))
+            item = (i,
+                    item_info['iname'],
+                    item_info['icost'],
+                    item_info['inotes'],
+                    constants.getStatusStrFromInt(item_info['istatus']) )
+            items.insert(0, item)
+            print item
+        task_info['items'] = items
+        return template('task.tpl', get_url=url, logged_in=logged_in, tinfo=task_info, uid=user_id, eid=event_id, tid = task_id)
+        
 	
 @get('/event/<user_id:re:\d+>/<event_id:re:\d+>/ajax')
 def show_event_ajax(rdb, user_id, event_id):
@@ -384,14 +408,14 @@ def newItem_route():
         redirect('/login')
 
 
-@post('/newitem')
-def newItem_submit(rdb):
-    result = item.create_item(rdb)
-    #   result = (user_id , event_id)
+@post('/newitem/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>')
+def newItem_submit(rdb, user_id, event_id, task_id):
+    result = item.create_item(rdb, user_id, event_id, task_id)
+    #   result = (user_id , event_id, task_id)
     if result:
         #Where to redirect? show_item, show_task, or show_event?
         #Currently redirect to show_event
-        redirect('/event/%s/%s' % result)
+        redirect('/task/%s/%s/%s' % result)
     #item created
     else:
         #failed to create event

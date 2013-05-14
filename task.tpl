@@ -1,0 +1,49 @@
+%rebase layout.tpl url=get_url, logged_in=logged_in
+
+<form method="GET">
+	<input id="refresh" type="submit" value="Refresh"/>
+</form>
+
+<div id="events">
+	<h3>Task </h3>
+        <labelfor=event_name">Event Name: {{tinfo['tname']}}</label><br/>
+        <label for="event_description">Event Description: {{tinfo['tinfo']}}</label><br/>
+        <label for="event_status">Event Status: {{tinfo['tcost']}}</label><br/>
+        <label for="event_type">Event Type: {{tinfo['strtstatus']}}</label><br/>
+
+
+<h3>Current Items </h3>
+%#print row['tasks']
+%#if tinfo['items']: 
+    %for item in tinfo['items']:
+        <span class="list_item>
+            <label for="task_name">Item Name: {{item[1]}}</label><br/>
+            <label for="task_description">Item Info: {{item[2]}}</label><br/>
+            <label for="task_cost">Item Cost: {{item[3]}}</label><br/>
+            <label for="task_status">Item Status: {{item[4]}}</label><br/>
+            <form >
+                <button type="submit" formaction="/task/{{uid}}/{{eid}}/{{tid}}/{{item[0]}}" formmethod="GET">Details</button>
+                <button type="submit" formaction="/delitem/{{uid}}/{{eid}}/{tid}}/{{item[0]}}" formmethod="POST">Delete</button>
+            </form>
+        </span>
+    %end
+
+<br><br/>
+<h2>Add a item to this task</h2><br/>
+<form action="/newitem/{{uid}}/{{eid}}/{{tid}}" method="POST">
+    <p>
+        <label for="item_name">Item Name:</label><br/>
+        <input type="text" name="item_name" size="30"/><br/>
+    </p>
+    <p>
+        <label for="item_info">Description:</label><br/>
+        <input type="text" name="item_info" size="30"/><br/>
+    </p>
+    <p>
+        <label for="item_cost">Cost ($):</label><br/>
+        <input type="text" name="item_cost" size="30"/><br/>
+    </p>
+	<input id="newitem" type="submit" value="Add Item"/>
+</form>
+</div>
+<script src="/ajax.js"></script>
