@@ -70,7 +70,7 @@ install(RedisPlugin())
 ########################################################################
 
 @get('/')
-def default_route():
+def default_route(rdb):
     logged_in = account.isLoggedIn()
     events = event.getAllPublicEvents(rdb)
 
