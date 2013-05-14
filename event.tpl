@@ -44,9 +44,21 @@
     %#end
 
 <br><br/>
-
-<form method="POST">
-	<input id="newtask" type="submit" value="New Task"/>
+<h2>Add a task to this event</h2><br/>
+<form action="/newtask/{{uid}}/{{eid}}" method="POST">
+    <p>
+        <label for="task_name">Task Name:</label><br/>
+        <input type="text" name="task_name" size="30"/><br/>
+    </p>
+    <p>
+        <label for="task_info">Description:</label><br/>
+        <input type="text" name="task_info" size="30"/><br/>
+    </p>
+    <p>
+        <label for="task_cost">Cost ($):</label><br/>
+        <input type="text" name="task_cost" size="30"/><br/>
+    </p>
+	<input id="newtask" type="submit" value="Add Task"/>
 </form>
 </div>
 <script src="/ajax.js"></script>
