@@ -40,6 +40,10 @@ def create_item(rdb):
                    'inotes' : inotes,
                    'istatus' : constants.getStatusIntFromStr(istatus) })
         rdb.hset('task:' + user_id + ':' + event_id + ':' + task_id, 'numitems', item_id)
+        
+        
+        #add item id to list of items for this event
+        rdb.sadd('taskids:%s:%s:%s' % (user_id, event_id, task_id), item_id)
     except:
         return None
 

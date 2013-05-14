@@ -32,8 +32,6 @@ install(RedisPlugin())
 #                   'etype' : etype,                        int - from constants
 #                   'numtasks' : numtasks                   int
 #
-#  --Removed public field from event, not sure what this was for, the
-#    etype is there to determine public/private
 #
 #      Key: task:ano:eno:tno
 #      Fields:      'tname' : tname,                        str
@@ -56,6 +54,9 @@ install(RedisPlugin())
 #       account:no:invited                          // Set of all events this account has been invited to help plan
 #       events:public                               // Set of all public events
 #       eventadmins:owneracctno:eventno             // Set of all accounts allowed to modify this event
+#New:
+#       taskids:ano:eno                             // List of all task ids associated with this event
+#       itemids:ano:eno:tno                         // List of all item ids associated with this task
 #
 #   CONSIDERATIONS:
 #       Invitations, there are 2 meanings here:
@@ -118,7 +119,7 @@ def userhome_route(rdb):
         lstpublics = getUserEventsList(rdb, user_id, 'public')
         
         return template('userhome.tpl',public_events=lstpublics,private_events=lstprivates,
-                        invited_events=lstinvited, get_url=url, logged_in=True)
+                        invited_events=lstinvited, get_url=url, logged_in=True, uid=user_id)
     else:
         redirect('/login')
         
@@ -297,7 +298,6 @@ def show_event_ajax(rdb, user_id, event_id):
         return template('eventajax.tpl', get_url=url, logged_in=logged_in, row=event_info)
     
 
-
 @post('/delevent/<user_id:re:\d+>/<event_id:re:\d+>')
 def delete_event(rdb, user_id, event_id):
     #ensure this event is owned by the current user
@@ -309,10 +309,10 @@ def delete_event(rdb, user_id, event_id):
     numtasks = rdb.hget('event:' + user_id + ':' + event_id, 'numtasks')
     
     #get all tasks for this event
-    for i in range(0, numtasks):
+    for i in rdb.smembers('taskids:' + user_id + ':' + event_id):
         #get all items for this task and delete
         numitems = rdb.hget('task:' + user_id + ':' + event_id + ':' + i)
-        for j in range(o, numitems):
+        for j in rdb.smembers('itemids:' + user_id + ':' + event_id + ':' + i):
             rdb.delete('item:' + user_id + ':' + event_id + ':' + i + ':' + j)
         rdb.delete('task:' + user_id + ':' + event_id + ':' + i)
     #delete the event
@@ -346,7 +346,7 @@ def delete_task(rdb, user_id, event_id, task_id):
     return redirect('/event/%s/%s' % (user_id, event_id), get_url=url, logged_in=logged_in)
 
 
-@post('/delitem/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>/<item_id:re:\d+>')
+#@post('/delitem/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>/<item_id:re:\d+>')
 
 
 @get('/newtask')
@@ -428,7 +428,7 @@ def getUserEventsList(rdb, no, pkey):
     if event_ids and event_ids != 'None':
         for i in event_ids:
             info = []
-            info.insert(0, i)
+            info.insert(0, i.split(":")[2])
             #inserting each field individually to make sure order is as expected.
             info.insert(1, rdb.hget(i, 'ename'))
             info.insert(2, rdb.hget(i, 'eventdesc'))
