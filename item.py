@@ -14,23 +14,17 @@ import constants, account
 #                   'numitems' : numitems                   int
 #
 
-def create_item(rdb):
+def create_item(rdb, user_id, event_id, task_id):
     #Get the item data from the form:
-    event_id = request.POST.get('event_id','').strip()
-    task_id = request.POST.get('task_id','').strip()
     iname = request.POST.get('item_name','').strip()
     icost = request.POST.get('item_cost','').strip()
     inotes = request.POST.get('item_notes','').strip()
-    istatus = request.POST.get('item_status','').strip()
-
-    #get current user info
-    user = request.get_cookie('account', secret='pass')
-    user_id = str(int(rdb.zscore('accounts:usernames', user)))
+    istatus = constants.STATUS_NEEDS_ATTENTION
     
     #Create new item_id
     item_id = int(rdb.hget('task:' + user_id + ':' + event_id + ':' + task_id, 'numitems')) + 1
 
-    item_key = 'item:%s:%s:%s' % (user_id, event_id, task_id, item_id)
+    item_key = 'item:%s:%s:%s:%s' % (user_id, event_id, task_id, item_id)
 
     #Try to add the new item to the database.
     try:
@@ -38,13 +32,13 @@ def create_item(rdb):
                  { 'iname' : iname,
                    'icost' : icost,
                    'inotes' : inotes,
-                   'istatus' : constants.getStatusIntFromStr(istatus) })
+                   'istatus' : istatus })
         rdb.hset('task:' + user_id + ':' + event_id + ':' + task_id, 'numitems', item_id)
         
         
         #add item id to list of items for this event
-        rdb.sadd('taskids:%s:%s:%s' % (user_id, event_id, task_id), item_id)
+        rdb.sadd('itemids:%s:%s:%s' % (user_id, event_id, task_id), item_id)
     except:
         return None
 
-    return (user_id,  event_id)
+    return (user_id,  event_id, task_id)
