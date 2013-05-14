@@ -58,3 +58,49 @@ def create_event(rdb):
         return (user_id,  event_id)
     except:
         return None
+
+
+########################################################################
+#addAdminToEvent - Gives another user rights to modify event.
+#   param   - rdb - redis db ojbect passed by plugin
+#   return  - username - The username of the account added.
+########################################################################
+def addAdminToEvent(rdb):
+    username = request.POST.get('username','').strip()
+    owner_id = request.POST.get('owner_id','').strip()
+    event_no = request.POST.get('event_no','').strip()
+
+    #Retrieve user account number from database
+    admin_no = str(rdb.zscore('accounts:usernames', username))
+
+    #If account was found, add account to admin list:
+    if admin_no:
+        event = 'event:' + owner_id + ':' + event_no
+        rdb.sadd('account:' + admin_no + ':invited', event)
+        rdb.sadd('eventadmins:' + owner_id + ':' + event_no, username)
+        return username
+    else:
+        return False
+
+
+########################################################################
+#remAdminFromEvent - Removes another user's rights to modify event.
+#   param   - rdb - redis db ojbect passed by plugin
+#   return  - username - The username of the account removed.
+########################################################################
+def remAdminFromEvent(rdb):
+    username = request.POST.get('username','').strip()
+    owner_id = request.POST.get('owner_id','').strip()
+    event_no = request.POST.get('event_no','').strip()
+
+    #Retrieve user account number from database
+    admin_no = str(rdb.zscore('accounts:usernames', username))
+
+    #If account was found, add account to admin list:
+    if admin_no:
+        event = 'event:' + owner_id + ':' + event_no
+        rdb.srem('account:' + admin_no + ':invited', event)
+        rdb.srem('eventadmins:' + owner_id + ':' + event_no, username)
+        return username
+    else:
+        return False

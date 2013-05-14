@@ -420,7 +420,43 @@ def newItem_submit(rdb, user_id, event_id, task_id):
     else:
         #failed to create event
         return "Failed to add item"
-    
+
+
+@get('/adduser')
+def adduser_route():
+    logged_in = account.isLoggedIn()
+    if logged_in:
+        return template('addadmin.tpl', get_url=url, logged_in=logged_in)
+    else:
+        redirect('/login')
+
+
+@post('/adduser')
+def adduser_submit(rdb):
+    result = event.addAdminToEvent(rdb)
+    if result:
+        return result + " was successfully added to this event's list of administrators."
+    else:
+        return "Failed to add " + result + " to this event's list of administrators."
+
+
+@get('/remuser')
+def remuser_route():
+    logged_in = account.isLoggedIn()
+    if logged_in:
+        return template('remadmin.tpl', get_url=url, logged_in=logged_in)
+    else:
+        redirect('/login')
+
+
+@post('/remuser')
+def remuser_submit(rdb):
+    result = event.remAdminFromEvent(rdb)
+    if result:
+        return result + " was successfully removed from this event's list of administrators."
+    else:
+        return "Failed to remove " + result + " from this event's list of administrators."
+
 
 @get('/:path#.+#', name='static')
 def static(path):
