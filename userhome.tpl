@@ -18,6 +18,7 @@
 	    <label for="event_name">Event Name: {{public[1]}}</label><br/>
 	    <label for="event_description">Event Description: {{public[2]}}</label><br/>
 	    <label for="event_duedate">Date Of Event: {{public[5]}}</label><br/><br/>
+        <a href="/event/{{uid}}/{{public[0]}}">details</a></br></br>
 	   </span>
 	%end
 	</div>
@@ -28,6 +29,7 @@
 	    <label for="event_name">Event Name: {{private[1]}}</label><br/>
 	    <label for="event_description">Event Description: {{private[2]}}</label><br/>
 	    <label for="event_duedate">Date Of Event: {{private[5]}}</label><br/><br/>
+        <a href="/event/{{uid}}/{{private[0]}}">details</a></br></br>
 	    </span>
 	%end
 	</div>
@@ -38,6 +40,7 @@
 	    <label for="event_name">Event Name: {{invited[1]}}</label><br/>
 	    <label for="event_description">Event Description: {{invited[2]}}</label><br/>
 	    <label for="event_duedate">Date Of Event: {{invited[5]}}</label><br/><br/>
+        <a href="/event/{{uid}}/{{invited[0]}}">details</a></br></br>
 	   </span>
 	%end
 

@@ -118,7 +118,7 @@ def userhome_route(rdb):
         lstpublics = getUserEventsList(rdb, user_id, 'public')
         
         return template('userhome.tpl',public_events=lstpublics,private_events=lstprivates,
-                        invited_events=lstinvited, get_url=url, logged_in=True)
+                        invited_events=lstinvited, get_url=url, logged_in=True, uid=user_id)
     else:
         redirect('/login')
         
@@ -295,7 +295,6 @@ def show_event_ajax(rdb, user_id, event_id):
         return template('eventajax.tpl', get_url=url, logged_in=logged_in, row=event_info)
     
 
-
 @post('/delevent/<user_id:re:\d+>/<event_id:re:\d+>')
 def delete_event(rdb, user_id, event_id):
     #ensure this event is owned by the current user
@@ -319,7 +318,7 @@ def delete_event(rdb, user_id, event_id):
     #delete event from sets
     if rdb.sismember('events:public', 'event:' + user_id + ':' + event_id):
         rdb.srem('events:public', 'event:' + user_id + ':' + event_id)
-        rdb.srem('account:' + user_id + ':public', 'event:' + user_id + ':' + event_id
+        rdb.srem('account:' + user_id + ':public', 'event:' + user_id + ':' + event_id)
     else:
         rdb.srem('account:' + user_id + ':private', 'event:' + user_id + ':' + event_id)
         
@@ -344,7 +343,7 @@ def delete_task(rdb, user_id, event_id, task_id):
     return redirect('/event/%s/%s' % (user_id, event_id), get_url=url, logged_in=logged_in)
 
 
-@post('/delitem/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>/<item_id:re:\d+>')
+#@post('/delitem/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>/<item_id:re:\d+>')
 
 
 @get('/newtask')
@@ -426,7 +425,7 @@ def getUserEventsList(rdb, no, pkey):
     if event_ids and event_ids != 'None':
         for i in event_ids:
             info = []
-            info.insert(0, i)
+            info.insert(0, i.split(":")[2])
             #inserting each field individually to make sure order is as expected.
             info.insert(1, rdb.hget(i, 'ename'))
             info.insert(2, rdb.hget(i, 'eventdesc'))
