@@ -6,12 +6,14 @@ A Event Planning/To-do list site created using Bottle
 TODO:
   - Calendar view
   - Implement Ajax for Calendar view
-  - Finish Event (Backend & Frontend):
-    . Delete - Problem: when we delete an task/item and it can put a whole in the list ids. we need to find a way to reset the ids to be in order or keep a seperate list of ids
-      . Tasks
-      . Items
     . Modify
       . Events
-      . Tasks
+      	-template
+      	-logic
       . Items
+      	-template
+      	-logic
   - Finish Account (Polish Front-end for modify portion)
+  	. CheckAccess function (check to see if current user can access this task (are they invited?)
+  - Invite other users to task
+	. Display invited to tasks on userhome

@@ -195,3 +195,17 @@ def next_id(rdb):
 
 
 
+def accountHasAccess(rdb, events_users_id, event_id):
+    #TODO check the list/set to see if this user can access this event
+
+    #do checks here
+    return True
+
+
+def accountHasAdmin(rdb, events_users_id, event_id):
+    #TODO check the list/set to see if this user can Modify this event
+
+    #do checks here
+    return True
+
+

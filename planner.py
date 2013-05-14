@@ -1,6 +1,6 @@
 import sha, time, Cookie, os, datetime, hashlib
 from bottle import get, post, route, debug, run, template, request, validate
-from bottle import static_file, url, response, redirect, install
+from bottle import static_file, url, response, redirect, install, abort
 from bottle_redis import RedisPlugin
 
 import account, event, constants, task, item
@@ -9,7 +9,7 @@ install(RedisPlugin())
 
 
 ########################################################################
-#                         Redis Notes                         #
+#                         Redis Notes                                  #
 ########################################################################
 #   Hash tables:
 #
@@ -66,7 +66,7 @@ install(RedisPlugin())
 
 
 ########################################################################
-#                         View Functions                         #
+#                         View Functions                               #
 ########################################################################
 
 @get('/')
@@ -232,7 +232,7 @@ def show_event(rdb, user_id, event_id):
                  task_info['numitems'],
                  [])
             #get items for each task
-            for j in range(1, int(task_info['numitems'])):
+            for j in rdb.smembers('itemids' + str(user_id) + ':' + str(event_id) + str(i)):
                 #get task
                 item_info = rdb.hgetall('item:' + str(user_id) + ':' + str(event_id) + ':' + str(i) + ':' + str(j))
                 item = (j,
@@ -240,7 +240,7 @@ def show_event(rdb, user_id, event_id):
                         item_info['icost'],
                         item_info['inotes'],
                         constants.getStatusStrFromInt(item_info['istatus']) )
-                t[7].insert(0, item)
+                t[6].insert(0, item)
             
             tasks.insert(0,t)
             #return info to template
@@ -328,7 +328,7 @@ def delete_event(rdb, user_id, event_id):
     user = request.get_cookie('account', secret='pass')
     cur_user_id = str(int(rdb.zscore('accounts:usernames', user)))
     if cur_user_id != user_id:
-        return "Access Denied!"
+        abort(401, "Sorry, access denied.")
         
     numtasks = rdb.hget('event:' + user_id + ':' + event_id, 'numtasks')
     
@@ -370,8 +370,27 @@ def delete_task(rdb, user_id, event_id, task_id):
     return redirect('/event/%s/%s' % (user_id, event_id), get_url=url, logged_in=logged_in)
 
 
-#@post('/delitem/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>/<item_id:re:\d+>')
+@post('/delitem/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>/<item_id:re:\d+>')
+def delete_item(rdb, user_id, event_id, task_id, item_id):
+    #ensure user is logged in
+    logged_in = account.isLoggedIn()
+    if not logged_in:
+        return redirect('/login')
 
+    #ensure this event is owned by the current user
+    user = request.get_cookie('account', secret='pass')
+    cur_user_id = str(int(rdb.zscore('accounts:usernames', user)))
+    if cur_user_id != user_id:
+        abort(401, "Sorry, access denied.")
+
+    #delete the item
+    rdb.delete('item:%s:%s:%s:%s' % (user_id, event_id, task_id, item_id))
+
+    #remove the item from it's taskids set
+    rdb.srem('itemids:%s:%s:%s' % (user_id, event_id, task_id), item_id)
+
+    #return user to event page
+    return redirect('/task/%s/%s/%s' % (user_id, event_id, task_id))
 
 @get('/newtask')
 def newTask_route(user_id, event_id):
@@ -413,13 +432,13 @@ def newItem_submit(rdb, user_id, event_id, task_id):
     result = item.create_item(rdb, user_id, event_id, task_id)
     #   result = (user_id , event_id, task_id)
     if result:
-        #Where to redirect? show_item, show_task, or show_event?
-        #Currently redirect to show_event
         redirect('/task/%s/%s/%s' % result)
     #item created
     else:
         #failed to create event
         return "Failed to add item"
+
+
 
 
 @get('/adduser')
@@ -456,6 +475,43 @@ def remuser_submit(rdb):
         return result + " was successfully removed from this event's list of administrators."
     else:
         return "Failed to remove " + result + " from this event's list of administrators."
+
+@get('/edittask/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>')
+def show_edit_task(rdb, user_id, event_id, task_id):
+    #ensure user is logged in
+    logged_in = account.isLoggedIn()
+    if not logged_in:
+        return redirect('/login')
+
+    #ensure user has access to change this event
+    if not account.accountHasAdmin(rdb, user_id, event_id):
+        abort(401, "Sorry, access is denied!")
+
+    #get event details to feed to template
+    task_info = rdb.hgetall('task:' + str(user_id) + ':' + str(event_id) + ':' + str(task_id))
+    if task_info:
+        return template('edittask.tpl', get_url=url, logged_in=logged_in, tinfo=task_info, uid=user_id, eid=event_id, tid=task_id)
+    else:
+        return abort(404, "Sorry, there is no task for this user and id")
+
+
+@post('/edittask/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>')
+def show_edit_task(rdb, user_id, event_id, task_id):
+    #ensure user is logged in
+    logged_in = account.isLoggedIn()
+    if not logged_in:
+        return redirect('/login')
+
+    #ensure user has access to change this event
+    if not account.accountHasAdmin(rdb, user_id, event_id):
+        abort(401, "Sorry, access is denied!")
+
+    result = task.edit_task(rdb, user_id, event_id, task_id)
+    if result:
+        redirect('/task/%s/%s/%s' % result)
+    else:
+        abort(400, "Error submiting your changes")
+
 
 
 @get('/:path#.+#', name='static')

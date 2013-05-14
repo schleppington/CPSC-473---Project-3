@@ -46,3 +46,25 @@ def create_task(rdb, user_id, event_id):
         return None
     
     return (user_id,  event_id)
+
+
+
+def edit_task(rdb, user_id, event_id, task_id):
+    try:
+        #get incoming fields
+        tname = request.POST.get('task_name','').strip()
+        tinfo = request.POST.get('task_info','').strip()
+        tcost = request.POST.get('task_cost','').strip()
+        tstatus = request.POST.get('status','').strip()
+
+        task_key = 'task:%s:%s:%s' % (user_id, event_id, task_id)
+
+        rdb.hmset(task_key,
+            {  'tname' : tname,
+                'tinfo' : tinfo,
+                'tcost' : tcost,
+                'tstatus' : constants.getStatusIntFromStr(tstatus)
+             })
+        return (user_id, event_id, task_id)
+    except:
+        return None

@@ -6,11 +6,13 @@
 
 <div id="events">
 	<h3>Task </h3>
-        <labelfor=event_name">Event Name: {{tinfo['tname']}}</label><br/>
-        <label for="event_description">Event Description: {{tinfo['tinfo']}}</label><br/>
-        <label for="event_status">Event Status: {{tinfo['tcost']}}</label><br/>
-        <label for="event_type">Event Type: {{tinfo['strtstatus']}}</label><br/>
-
+        <labelfor=event_name">Task Name: {{tinfo['tname']}}</label><br/>
+        <label for="event_description">Task Description: {{tinfo['tinfo']}}</label><br/>
+        <label for="event_status">Task Cost ($): {{tinfo['tcost']}}</label><br/>
+        <label for="event_type">Task Type: {{tinfo['strtstatus']}}</label><br/>
+    <form>
+        <button type="submit" formaction="/edittask/{{uid}}/{{eid}}/{{tid}}" formmethod="GET">edit</button><br/>
+    </form>
 
 <h3>Current Items </h3>
 %#print row['tasks']
@@ -23,7 +25,7 @@
             <label for="task_status">Item Status: {{item[4]}}</label><br/>
             <form >
                 <button type="submit" formaction="/task/{{uid}}/{{eid}}/{{tid}}/{{item[0]}}" formmethod="GET">Details</button>
-                <button type="submit" formaction="/delitem/{{uid}}/{{eid}}/{tid}}/{{item[0]}}" formmethod="POST">Delete</button>
+                <button type="submit" formaction="/delitem/{{uid}}/{{eid}}/{{tid}}/{{item[0]}}" formmethod="POST">Delete</button>
             </form>
         </span>
     %end
