@@ -8,7 +8,6 @@ TODO:
   - Implement Ajax for Calendar view
   - Finish Event (Backend & Frontend):
     . Delete
-      . Events
       . Tasks
       . Items
     . Modify
