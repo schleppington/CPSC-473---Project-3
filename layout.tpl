@@ -16,8 +16,8 @@
             <a href="/modifyacct">Modify Account</a>
             <a href="/inviteuser">Invite User</a>
             <a href="/newevent">New Event</a>
-            <a href="/newtask">New Task</a>
-            <a href="/newitem">New Item</a>
+          %#  <a href="/newtask">New Task</a>
+          %#  <a href="/newitem">New Item</a>
             <a href="/userhome">My Account</a>
             <a href="/logout">Logout</a>
             %end
