@@ -1,4 +1,4 @@
-import sqlite3, sha, time, Cookie, os, datetime, hashlib
+import sha, time, Cookie, os, datetime, hashlib
 from bottle import get, post, route, debug, run, template, request, validate
 from bottle import static_file, url, response, redirect, install
 from bottle_redis import RedisPlugin
@@ -206,7 +206,7 @@ def newEvent_submit(rdb):
 def show_event(rdb, user_id, event_id):
     
     logged_in = account.isLoggedIn()
-    if logged_in:    #switched
+    if logged_in:
         #get event info
         event_info = rdb.hgetall('event:' + str(user_id) + ':' + str(event_id))
         
@@ -348,10 +348,10 @@ def delete_task(rdb, user_id, event_id, task_id):
 
 
 @get('/newtask')
-def newTask_route():
+def newTask_route(user_id, event_id):
     logged_in = account.isLoggedIn()
     if logged_in:
-        return template('newtask.tpl', get_url=url, logged_in=logged_in)
+        return template('newtask.tpl', get_url=url, logged_in=logged_in, event_id=event_id)
     else:
         redirect('/login')
 

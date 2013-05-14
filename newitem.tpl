@@ -4,19 +4,19 @@
 Enter The Item's Details<br/>
 <form action="/newitem" method="POST">
     <p>
-        <label for="item_name">Event Name:</label><br/>
+        <label for="item_name">Item Name:</label><br/>
         <input type="text" name="item_name" size="30"/><br/>
     </p>
     <p>
-        <label for="item_notes">Event Description:</label><br/>
+        <label for="item_notes">Item Notes:</label><br/>
         <textarea name="item_notes" cols="60" rows="10"></textarea><br/>
     </p>
     <p>
-        <label for="item_cost">Select A Date:</label><br/>
+        <label for="item_cost">Item Cost: $ </label><br/>
         <input type="text" name="item_cost"/>
     </p>
     <p>
-        <label for="item_status">Event Status:</label><br/>
+        <label for="item_status">Item Status:</label><br/>
         <select name="item_status">
             <option value="'Needs Attention">Needs Attention</option>
             <option value="In Progress">In Progress</option>

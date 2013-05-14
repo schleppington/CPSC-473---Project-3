@@ -4,19 +4,19 @@
 Enter The Task's Details<br/>
 <form action="/newtask" method="POST">
     <p>
-        <label for="task_name">Event Name:</label><br/>
+        <label for="task_name">Task Name:</label><br/>
         <input type="text" name="task_name" size="30"/><br/>
     </p>
     <p>
-        <label for="task_description">Event Description:</label><br/>
+        <label for="task_description">Task Description:</label><br/>
         <textarea name="task_description" cols="60" rows="10"></textarea><br/>
     </p>
     <p>
-        <label for="task_cost">Select A Date:</label><br/>
+        <label for="task_cost">Cost of Task: $</label><br/>
         <input type="text" name="task_cost"/>
     </p>
     <p>
-        <label for="task_status">Event Status:</label><br/>
+        <label for="task_status">Task Status:</label><br/>
         <select name="task_status">
             <option value="'Needs Attention">Needs Attention</option>
             <option value="In Progress">In Progress</option>
