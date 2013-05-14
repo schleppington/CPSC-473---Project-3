@@ -252,6 +252,30 @@ def show_event(rdb, user_id, event_id):
     
     else:
         redirect('/userhome')
+
+
+@get('/task/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>')
+def show_task(rdb, user_id, event_id, task_id):
+    logged_in = account.isLoggedIn()
+    if logged_in:
+        #todo: make sure user has access to this event
+        
+        #get task info        
+        task_info = rdb.hgetall('task:' + str(user_id) + ':' + str(event_id) + ':' + str(task_id))
+        
+        #get items for this task
+        items = []
+        for i in rdb.smembers('taskids:' + str(user_id) + ':' + str(event_id)):
+            item_info = rdb.hgetall('item:' + str(user_id) + ':' + str(event_id) + ':' + str(task_id) + ':' + str(i))
+            item = (i,
+                    item_info['iname'],
+                    item_info['icost'],
+                    item_info['inotes'],
+                    constants.getStatusStrFromInt(item_info['istatus']) )
+            items.insert(0, item)
+        task_info['items'] = items
+        return template('task.tpl', get_url=url, logged_in=logged_in, tinfo=task_info, uid=user_id, eid=event_id, tid = task_id)
+        
 	
 @get('/event/<user_id:re:\d+>/<event_id:re:\d+>/ajax')
 def show_event_ajax(rdb, user_id, event_id):
