@@ -219,7 +219,7 @@ def show_event(rdb, user_id, event_id):
         
         #get tasks for this event
         tasks = []
-        for i in range(1, int(event_info['numtasks'])):
+        for i in rdb.smembers('taskids:'+ str(user_id) + ':' + str(event_id)):
             #get task
             task_info = rdb.hgetall('task:' + str(user_id) + ':' + str(event_id) + ':' + str(i))
             print task_info
