@@ -296,7 +296,6 @@ def show_event_ajax(rdb, user_id, event_id):
     
 
 
-# INCOMPLETE
 @get('/delevent/<user_id:re:\d+>/<event_id:re:\d+>')
 def delete_event(rdb, user_id, event_id):
     #ensure this event is owned by the current user
@@ -317,10 +316,13 @@ def delete_event(rdb, user_id, event_id):
     #delete the event
     rdb.delete('event:' + user_id + ':' + event_id)
     
+    #delete event from sets
     if rdb.sismember('events:public', 'event:' + user_id + ':' + event_id):
-        rdb.srem('event:' + user_id + ':' + event_id)
+        rdb.srem('events:public', 'event:' + user_id + ':' + event_id)
+        rdb.srem('account:' + user_id + ':public', 'event:' + user_id + ':' + event_id
+    else:
+        rdb.srem('account:' + user_id + ':private', 'event:' + user_id + ':' + event_id)
         
-    #TODO: delete items from the other sets here
     return redirect('/userhome')
 
 
