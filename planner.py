@@ -72,8 +72,9 @@ install(RedisPlugin())
 @get('/')
 def default_route():
     logged_in = account.isLoggedIn()
-    
-    return template('default.tpl', get_url=url, logged_in=logged_in)
+    events = event.getAllPublicEvents(rdb)
+
+    return template('default.tpl', get_url=url, logged_in=logged_in, events=events)
 
 
 @get('/login')
