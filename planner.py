@@ -104,6 +104,7 @@ def logout_route():
         response.delete_cookie('account', secret='pass')
     redirect('/login')
 
+
 @get('/userhome')
 def userhome_route(rdb):
     if account.isLoggedIn():
@@ -163,6 +164,15 @@ def signup_submit(rdb):
         return template('loginfail.tpl', get_url=url, logged_in=result)
 
 
+@get('/myaccount')
+def myacct_route(rdb):
+    logged_in = account.isLoggedIn()
+    if logged_in:
+        acct = account.getUserInfo(rdb)
+        acct.append(request.get_cookie('account', secret='pass'))
+        return template('myaccount.tpl', get_url=url, logged_in=logged_in, acct=acct)
+
+
 @get('/modifyacct')
 def modifyacct_route(rdb):
     logged_in = account.isLoggedIn()
@@ -178,9 +188,7 @@ def modifyacct_submit(rdb):
     result = account.modify_account(rdb)
     print result
     if result:
-        #are we wanting to return this template? why not redirect to userhome instead of erturning the same template?
-        return template('userhome.tpl', get_url=url, logged_in=result)
-        #redirect('/userhome')
+        redirect('/myaccount')
     else:
         return "Failed to modify account."
 
