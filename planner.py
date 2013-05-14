@@ -296,7 +296,7 @@ def show_event_ajax(rdb, user_id, event_id):
     
 
 
-@get('/delevent/<user_id:re:\d+>/<event_id:re:\d+>')
+@post('/delevent/<user_id:re:\d+>/<event_id:re:\d+>')
 def delete_event(rdb, user_id, event_id):
     #ensure this event is owned by the current user
     user = request.get_cookie('account', secret='pass')
@@ -324,6 +324,27 @@ def delete_event(rdb, user_id, event_id):
         rdb.srem('account:' + user_id + ':private', 'event:' + user_id + ':' + event_id)
         
     return redirect('/userhome')
+
+
+@post('/deltask/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>')
+def delete_task(rdb, user_id, event_id, task_id):
+    #ensure this event is owned by the current user
+    user = request.get_cookie('account', secret='pass')
+    cur_user_id = str(int(rdb.zscore('accounts:usernames', user)))
+    if cur_user_id != user_id:
+        return "Access Denied!"
+    
+    #get items for this task
+    numitems = rdb.hget('task:' + user_id + ':' + event_id + ':' + i)
+    for j in range(o, numitems):
+        rdb.delete('item:' + user_id + ':' + event_id + ':' + task_id + ':' + j)
+    rdb.delete('task:' + user_id + ':' + event_id + ':' + i)
+    
+    #return user to event page
+    return redirect('/event/%s/%s' % (user_id, event_id), get_url=url, logged_in=logged_in)
+
+
+@post('/delitem/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>/<item_id:re:\d+>')
 
 
 @get('/newtask')

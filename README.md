@@ -7,7 +7,7 @@ TODO:
   - Calendar view
   - Implement Ajax for Calendar view
   - Finish Event (Backend & Frontend):
-    . Delete
+    . Delete - Problem: when we delete an task/item and it can put a whole in the list ids. we need to find a way to reset the ids to be in order or keep a seperate list of ids
       . Tasks
       . Items
     . Modify
