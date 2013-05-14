@@ -111,25 +111,30 @@ def modify_account(rdb):
 
 
 ########################################################################
-# getUserModInfo - retrieves user's modifiable account information
+# getUserInfo - retrieves user's account information
 #   param - rdb - redis db object passed by plugin
-#   return - result - an array containing the user's first name, last
-#                     name and email address
+#   return - result - a list of the user's information
 ########################################################################
 
-def getUserModInfo(rdb):
+def getUserInfo(rdb):
     #Get user's username and id
     user = request.get_cookie('account', secret='pass')
     user_id = str(int(rdb.zscore('accounts:usernames', user)))
+
+    numEvents = int(rdb.scard('account:' + user_id + ':public'))
+    numEvents += int(rdb.scard('account:' + user_id + ':private'))
 
     #For some reason, the results of
     #rdb.hmget('account:' + user_id, { 'firstname', 'lastname', 'useremail' })
     #are ordered incorrectly ('firstname', 'useremail', 'lastname'). Used
     #the following workaround:
     result = []
-    result.insert(0, rdb.hget('account:' + user_id, 'firstname'))
-    result.insert(1,rdb.hget('account:' + user_id, 'lastname'))
-    result.insert(2,rdb.hget('account:' + user_id, 'useremail'))
+    result.insert(0, user)
+    result.insert(1, rdb.hget('account:' + user_id, 'firstname'))
+    result.insert(2, rdb.hget('account:' + user_id, 'lastname'))
+    result.insert(3, rdb.hget('account:' + user_id, 'useremail'))
+    result.insert(4, numEvents)
+    result.insert(5, rdb.scard('account:' + user_id + ':invited'))
     return result
 
 
