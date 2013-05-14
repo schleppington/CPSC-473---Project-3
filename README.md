@@ -8,11 +8,11 @@ TODO:
   - Implement Ajax for Calendar view
     . Modify
       . Events
-      	-template
-      	-logic
+      	- template
+      	- logic
       . Items
-      	-template
-      	-logic
+      	- template
+      	- logic
   - Finish Account (Polish Front-end for modify portion)
   	. CheckAccess function (check to see if current user can access this task (are they invited?)
   - Invite other users to task
