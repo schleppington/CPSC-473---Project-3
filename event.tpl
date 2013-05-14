@@ -2,7 +2,7 @@
 
 %rebase layout.tpl url=get_url, logged_in=logged_in
 
-<form method="POST">
+<form method="GET">
 	<input id="refresh" type="submit" value="Refresh"/>
 </form>
 

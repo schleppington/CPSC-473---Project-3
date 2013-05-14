@@ -102,7 +102,6 @@ def logout_route():
         response.delete_cookie('account', secret='pass')
     redirect('/login')
 
-@post('/userhome')
 @get('/userhome')
 def userhome_route(rdb):
     if account.isLoggedIn():
@@ -123,6 +122,25 @@ def userhome_route(rdb):
     else:
         redirect('/login')
         
+
+@get('/userhome/ajax')
+def userhome_ajax(rdb):
+    if account.isLoggedIn():
+        user = request.get_cookie('account', secret='pass')
+        user_id = str(int(rdb.zscore('accounts:usernames', user)))
+        
+        #get list of private events for current user
+        lstprivates = getUserEventsList(rdb, user_id, 'private')
+        
+        #get list of invited to events for current user
+        lstinvited = getUserEventsList(rdb, user_id, 'invited')
+        
+        #get list of public events for current user
+        lstpublics = getUserEventsList(rdb, user_id, 'public')
+        
+        return template('userhomeajax.tpl',public_events=lstpublics,private_events=lstprivates,
+                        invited_events=lstinvited, get_url=url, logged_in=True)
+
 
 
 @get('/signup')
@@ -184,7 +202,6 @@ def newEvent_submit(rdb):
         #failed to create event
         return "Failed to create event"
 
-@post('/event/<user_id:re:\d+>/<event_id:re:\d+>')
 @get('/event/<user_id:re:\d+>/<event_id:re:\d+>')
 def show_event(rdb, user_id, event_id):
     
@@ -232,6 +249,51 @@ def show_event(rdb, user_id, event_id):
     
     else:
         redirect('/userhome')
+	
+@get('/event/<user_id:re:\d+>/<event_id:re:\d+>/ajax')
+def show_event_ajax(rdb, user_id, event_id):
+    logged_in = account.isLoggedIn()
+    if logged_in:    #switched
+        #get event info
+        event_info = rdb.hgetall('event:' + str(user_id) + ':' + str(event_id))
+        
+        #add string versions of constants
+        event_info['strestatus'] = constants.getEventTypeStrFromInt(event_info['estatus'])
+        event_info['stretype'] = constants.getStatusStrFromInt(event_info['etype'])
+        event_info['user_id'] = user_id
+        event_info['event_id'] = event_id
+        
+        #get tasks for this event
+        tasks = []
+        for i in range(1, int(event_info['numtasks'])):
+            #get task
+            task_info = rdb.hgetall('task:' + str(user_id) + ':' + str(event_id) + ':' + str(i))
+            print task_info
+            t = (   i,
+                 task_info['tname'],
+                 task_info['tinfo'],
+                 task_info['tcost'],
+                 constants.getStatusStrFromInt(task_info['tstatus']),
+                 task_info['numitems'],
+                 [])
+            #get items for each task
+            for j in range(1, int(task_info['numitems'])):
+                #get task
+                item_info = rdb.hgetall('item:' + str(user_id) + ':' + str(event_id) + ':' + str(i) + ':' + str(j))
+                item = (j,
+                        item_info['iname'],
+                        item_info['icost'],
+                        item_info['inotes'],
+                        constants.getStatusStrFromInt(item_info['istatus']) )
+                t[7].insert(0, item)
+            
+            tasks.insert(0,t)
+            #return info to template
+            event_info['tasks'] = tasks
+        
+        #TODO: create template to display event info
+        return template('eventajax.tpl', get_url=url, logged_in=logged_in, row=event_info)
+    
 
 
 # INCOMPLETE
