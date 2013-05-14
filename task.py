@@ -14,18 +14,13 @@ import constants, account
 #                   'numitems' : numitems                   int
 #
 
-def create_task(rdb):
+def create_task(rdb, user_id, event_id):
     try:
         #get incoming fields
-        event_id = request.POST.get('event_id','').strip()
         tname = request.POST.get('task_name','').strip()
         tinfo = request.POST.get('task_info','').strip()
         tcost = request.POST.get('task_cost','').strip()
-        tstatus = request.POST.get('task_status','').strip()
-        
-        #get current user info
-        user = request.get_cookie('account', secret='pass')
-        user_id = str(int(rdb.zscore('accounts:usernames', user)))
+        tstatus = constants.STATUS_NEEDS_ATTENTION #request.POST.get('task_status','').strip()
 
         #Increment numtasks to get new task_id
         task_id = int(rdb.hget('event:' + user_id + ':' + event_id, 'numtasks')) + 1
@@ -37,7 +32,7 @@ def create_task(rdb):
                  {  'tname' : tname, 
                     'tinfo' : tinfo, 
                     'tcost' : tcost,
-                    'tstatus' : constants.getStatusIntFromStr(tstatus), 
+                    'tstatus' : tstatus, 
                     'numitems' : 0
                  })
                  

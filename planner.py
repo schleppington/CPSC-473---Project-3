@@ -3,7 +3,7 @@ from bottle import get, post, route, debug, run, template, request, validate
 from bottle import static_file, url, response, redirect, install
 from bottle_redis import RedisPlugin
 
-import account, event, constants
+import account, event, constants, task
 
 install(RedisPlugin())
 
@@ -243,10 +243,10 @@ def show_event(rdb, user_id, event_id):
             
             tasks.insert(0,t)
             #return info to template
-            event_info['tasks'] = tasks
-        
+        event_info['tasks'] = tasks
+        print event_info
         #TODO: create template to display event info
-        return template('event.tpl', get_url=url, logged_in=logged_in, row=event_info)
+        return template('event.tpl', get_url=url, logged_in=logged_in, row=event_info, uid=user_id, eid=event_id)
     
     else:
         redirect('/userhome')
@@ -356,13 +356,16 @@ def newTask_route(user_id, event_id):
         redirect('/login')
 
 
-@post('/newtask')
-def newTask_submit(rdb):
-    result = task.create_task(rdb)
+@post('/newtask/<user_id:re:\d+>/<event_id:re:\d+>')
+def newTask_submit(rdb, user_id, event_id):
+    #Get user's id
+    user = request.get_cookie('account', secret='pass')
+    cur_user_id = str(int(rdb.zscore('accounts:usernames', user)))
+    if cur_user_id != user_id:
+        return "Access Denied!"
+    result = task.create_task(rdb, user_id, event_id)
     #   result = (user_id , event_id)
     if result:
-        #Where to redirect? show_task or show_event?
-        #Currently redirect to show_event
         redirect('/event/%s/%s' % result)
     #task created
     else:
