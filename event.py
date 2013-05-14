@@ -104,3 +104,31 @@ def remAdminFromEvent(rdb):
         return username
     else:
         return False
+
+
+########################################################################
+#getAllPublicEvents - Creates a list of all public events
+#   param   - rdb - redis db ojbect passed by plugin
+#   return  - lst - a list containing the public events.
+########################################################################
+def getAllPublicEvents(rdb):
+    lst = []
+    event_ids = rdb.smembers('events:public')
+
+    #Use the ID's to retrieve the event information we're looking for
+    if event_ids and event_ids != 'None':
+        for i in event_ids:
+            acct_id = i.split(":")[1]
+            event_id = i.split(":")[2]
+            username = rdb.zrange('accounts:usernames', int(acct_id) - 1, int(acct_id) -1)
+            info = []
+            info.insert(0, acct_id)
+            info.insert(1, event_id)
+            #inserting each field individually to make sure order is as expected.
+            info.insert(2, rdb.hget(i, 'ename'))
+            info.insert(3, rdb.hget(i, 'eventdesc'))
+            info.insert(4, rdb.hget(i, 'eduedate'))
+            info.insert(5, username[0])
+            lst.insert(0,  (info))
+    
+    return lst
