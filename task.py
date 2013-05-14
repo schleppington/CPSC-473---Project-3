@@ -44,6 +44,9 @@ def create_task(rdb):
         #update event's task count
         rdb.hincrby('event:' + user_id + ':' + event_id, 'numtasks', 1)
         
+        #add task id to list of tasks for this event
+        rdb.sadd('taskids:%s:%s' % (user_id, event_id), task_id)
+        
     except:
         return None
     
