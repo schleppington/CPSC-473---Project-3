@@ -177,7 +177,9 @@ def modifyacct_submit(rdb):
     result = account.modify_account(rdb)
     print result
     if result:
+        #are we wanting to return this template? why not redirect to userhome instead of erturning the same template?
         return template('userhome.tpl', get_url=url, logged_in=result)
+        #redirect('/userhome')
     else:
         return "Failed to modify account."
 
@@ -319,7 +321,7 @@ def delete_event(rdb, user_id, event_id):
     #delete event from sets
     if rdb.sismember('events:public', 'event:' + user_id + ':' + event_id):
         rdb.srem('events:public', 'event:' + user_id + ':' + event_id)
-        rdb.srem('account:' + user_id + ':public', 'event:' + user_id + ':' + event_id
+        rdb.srem('account:' + user_id + ':public', 'event:' + user_id + ':' + event_id)
     else:
         rdb.srem('account:' + user_id + ':private', 'event:' + user_id + ':' + event_id)
         
