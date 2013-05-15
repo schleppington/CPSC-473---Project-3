@@ -7,9 +7,7 @@
         %#eventinfo[3]  = Event Status
         %#eventinfo[4]  = Event Type
         %#eventinfo[5]  = Event Due Date
-<form method="GET"> 
-	<input id="refresh" type="submit" value="Refresh"/>
-</form>
+
 <div id="events">
 	<div>
 	<h3>My Public Events: </h3>

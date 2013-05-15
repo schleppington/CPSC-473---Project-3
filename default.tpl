@@ -8,10 +8,6 @@
         %#event[4]  = Event Due Date
         %#event[5]  = Username
 
-<form method="GET"> 
-  <input id="refresh" type="submit" value="Refresh"/>
-</form>
-
 <div id="events">
 	<div>
 	<h3>All Public Events: </h3>

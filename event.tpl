@@ -1,9 +1,5 @@
 %rebase layout.tpl url=get_url, logged_in=logged_in
 
-<form method="GET">
-	<input id="refresh" type="submit" value="Refresh"/>
-</form>
-
 <div id="events">
 	<h3>Event </h3>
         <labelfor=event_name">Event Name: {{row['ename']}}</label><br/>
