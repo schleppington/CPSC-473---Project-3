@@ -10,9 +10,10 @@
         <label for="event_numinvited">Number of Invitations: {{row['numinvited']}}</label><br/>
         <label for="event_responded">Number of Responses: {{row['responded']}}</label><br><br/>
         <form >
-            <button type="submit" formaction="/event/{{uid}}/{{eid}}" formmethod="GET">Details</button>
+            %if perms:
             <button type="submit" formaction="/editevent/{{uid}}/{{eid}}" formmethod="GET">Edit</button>
             <button type="submit" formaction="/delevent/{{uid}}/{{eid}}" formmethod="POST">Delete</button>
+            %end
         </form>
         	
 
