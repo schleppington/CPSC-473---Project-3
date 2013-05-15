@@ -33,7 +33,9 @@
 		<button type="button">Details</button>
 	    </a>
             <form >
+                %if perms:
                 <button type="submit" formaction="/deltask/{{uid}}/{{eid}}/{{task[0]}}" formmethod="POST">Delete</button>
+                %end
             </form>
 	    
         </span>

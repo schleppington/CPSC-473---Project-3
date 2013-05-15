@@ -7,7 +7,9 @@
         <label for="event_status">Task Cost ($): {{tinfo['tcost']}}</label><br/>
         <label for="event_type">Task Type: {{tinfo['strtstatus']}}</label><br/>
     <form>
+        %if perms:
         <button type="submit" formaction="/edittask/{{uid}}/{{eid}}/{{tid}}" formmethod="GET">edit</button><br/>
+        %end
     </form>
 
 <h3>Current Items </h3>
@@ -21,7 +23,9 @@
             <label for="task_status">Item Status: {{item[4]}}</label><br/>
             <form >
                 <button type="submit" formaction="/edititem/{{uid}}/{{eid}}/{{tid}}/{{item[0]}}" formmethod="GET">Edit</button>
+                %if perms:
                 <button type="submit" formaction="/delitem/{{uid}}/{{eid}}/{{tid}}/{{item[0]}}" formmethod="POST">Delete</button>
+                %end
             </form>
         </span>
     %end
