@@ -52,12 +52,12 @@ install(RedisPlugin())
 #       account:no:public                           // Set of all public events this account owns
 #       account:no:private                          // Set of all private events this account owns
 #       account:no:admin                            // Set of all events this account is allowed to modify
-#       account:no:invited                          // Set of all events this account has been invited to help plan
+#       account:no:invite                           // Set of all events this account is allowed to view
+#       event:acctno:eventno:invited                // Set of email addresses of users invited to this event
+#       event:acctno:eventno:admins                 // Set of all accounts allowed to modify this event
 #       events:public                               // Set of all public events
-#       eventadmins:owneracctno:eventno             // Set of all accounts allowed to modify this event
-#       eventviewers:owneracctno:eventno            // Set of all accounts allowed to view this event
-#       taskids:ano:eno                             // List of all task ids associated with this event
 #       itemids:ano:eno:tno                         // List of all item ids associated with this task
+#       taskids:ano:eno                             // List of all task ids associated with this event
 #
 ########################################################################
 
