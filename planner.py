@@ -22,7 +22,7 @@ install(RedisPlugin())
 #                   'salt' : salt                           str
 #
 #      Key: event:ano:eno
-#       Fields:		'ename' : ename,                        str
+#       Fields:    	'ename' : ename,                        str
 #                   'eduedate' : eduedate,                  datetime
 #                   'eventdesc' : eventdesc,                str
 #                   'numinvited' : numinvited,              int
@@ -132,12 +132,12 @@ def userhome_route(rdb):
                         invited_events=lstinvited, admin_events=lstadmin, get_url=url, 
                         logged_in=True, uid=user_id)
     else:
-        redirect('/login')
+        redirect ('/')
         
 
 @get('/userhome/ajax')
 def userhome_ajax(rdb):
-   if account.isLoggedIn():
+    if account.isLoggedIn():
         user = request.get_cookie('account', secret='pass')
         user_id = str(int(rdb.zscore('accounts:usernames', user)))
         
@@ -156,6 +156,8 @@ def userhome_ajax(rdb):
         return template('userhomeajax.tpl',public_events=lstpublics,private_events=lstprivates,
                         invited_events=lstinvited, admin_events=lstadmin, get_url=url, 
                         logged_in=True, uid=user_id)
+    else:
+        redirect ('/')
 
 
 @get('/signup')
@@ -231,9 +233,8 @@ def newEvent_submit(rdb):
 
 @get('/event/<user_id:re:\d+>/<event_id:re:\d+>')
 def show_event(rdb, user_id, event_id):
-    
     logged_in = account.isLoggedIn()
-    if logged_in:
+    if account.accountHasAccess(rdb, user_id, event_id):
         #get event info
         event_info = rdb.hgetall('event:' + str(user_id) + ':' + str(event_id))
         
@@ -276,7 +277,6 @@ def show_event(rdb, user_id, event_id):
         return template('event.tpl', get_url=url, logged_in=logged_in,
                                      row=event_info, uid=user_id,
                                      perms=permission, eid=event_id)
-    
     else:
         redirect('/userhome')
 
@@ -284,7 +284,7 @@ def show_event(rdb, user_id, event_id):
 @get('/event/<user_id:re:\d+>/<event_id:re:\d+>/ajax')
 def show_event_ajax(rdb, user_id, event_id):
     logged_in = account.isLoggedIn()
-    if logged_in:
+    if account.accountHasAccess(rdb, user_id, event_id):
         #get event info
         event_info = rdb.hgetall('event:' + str(user_id) + ':' + str(event_id))
         
@@ -326,13 +326,14 @@ def show_event_ajax(rdb, user_id, event_id):
         return template('eventajax.tpl', get_url=url, logged_in=logged_in,
                                          row=event_info, uid=user_id,
                                          perms=permission, eid=event_id)
+    else:
+        redirect('/userhome')
 
 
 @get('/task/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>')
 def show_task(rdb, user_id, event_id, task_id):
     logged_in = account.isLoggedIn()
-    if logged_in:
-        #todo: make sure user has access to this event
+    if account.accountHasAccess(rdb, user_id, event_id):
         
         #get task info        
         task_info = rdb.hgetall('task:' + str(user_id) + ':' + str(event_id) + ':' + str(task_id))
@@ -355,13 +356,14 @@ def show_task(rdb, user_id, event_id, task_id):
                                     tinfo=task_info, uid=user_id,
                                     eid=event_id, tid = task_id,
                                     perms=permission)
+    else:
+        redirect('/userhome')
 
 
 @get('/task/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>/ajax')
 def show_task_ajax(rdb, user_id, event_id, task_id):
     logged_in = account.isLoggedIn()
-    if logged_in:
-        #todo: make sure user has access to this event
+    if account.accountHasAccess(rdb, user_id, event_id):
         
         #get task info        
         task_info = rdb.hgetall('task:' + str(user_id) + ':' + str(event_id) + ':' + str(task_id))
@@ -384,6 +386,8 @@ def show_task_ajax(rdb, user_id, event_id, task_id):
                                         tinfo=task_info, uid=user_id,
                                         eid=event_id, tid = task_id,
                                         perms=permission)
+    else:
+        redirect('/userhome')
 
 
 @post('/delevent/<user_id:re:\d+>/<event_id:re:\d+>')
