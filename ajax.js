@@ -10,16 +10,14 @@ var doGet = function (URL) {
         }
          
         events.innerHTML = xhr.responseText;
+	setTimeout('doGet(document.URL)', 1000);
     };
     xhr.send();
 }
  
 window.onload = function () {
-    var refresh = document.getElementById("refresh");   
-    refresh.onclick = function () {
-        doGet(document.URL);
-        return false;
-    };
+    var refresh = document.getElementById("refresh");
+	setTimeout('doGet(document.URL)', 1000);
 };
 
 //modified from example code from Professor Avery
