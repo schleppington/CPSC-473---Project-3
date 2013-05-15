@@ -76,6 +76,13 @@ def default_route(rdb):
 
     return template('default.tpl', get_url=url, logged_in=logged_in, events=events)
 
+@get('//ajax')
+def default_ajax(rdb):
+    logged_in = account.isLoggedIn()
+    events = event.getAllPublicEvents(rdb)
+
+    return template('defaultajax.tpl', get_url=url, logged_in=logged_in, events=events)
+
 
 @get('/login')
 def login_route():
