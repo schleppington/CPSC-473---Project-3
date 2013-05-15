@@ -149,7 +149,7 @@ def userhome_ajax(rdb):
         lstpublics = getUserEventsList(rdb, user_id, 'public')
         
         return template('userhomeajax.tpl',public_events=lstpublics,private_events=lstprivates,
-                        invited_events=lstinvited, get_url=url, logged_in=True)
+                        invited_events=lstinvited, get_url=url, logged_in=True, uid=user_id)
 
 
 @get('/signup')
@@ -296,7 +296,7 @@ def show_task(rdb, user_id, event_id, task_id):
 @get('/event/<user_id:re:\d+>/<event_id:re:\d+>/ajax')
 def show_event_ajax(rdb, user_id, event_id):
     logged_in = account.isLoggedIn()
-    if logged_in:    #switched
+    if logged_in:
         #get event info
         event_info = rdb.hgetall('event:' + str(user_id) + ':' + str(event_id))
         
@@ -308,7 +308,7 @@ def show_event_ajax(rdb, user_id, event_id):
         
         #get tasks for this event
         tasks = []
-        for i in range(1, int(event_info['numtasks'])):
+        for i in rdb.smembers('taskids:'+ str(user_id) + ':' + str(event_id)):
             #get task
             task_info = rdb.hgetall('task:' + str(user_id) + ':' + str(event_id) + ':' + str(i))
             print task_info
@@ -320,7 +320,7 @@ def show_event_ajax(rdb, user_id, event_id):
                  task_info['numitems'],
                  [])
             #get items for each task
-            for j in range(1, int(task_info['numitems'])):
+            for j in rdb.smembers('itemids' + str(user_id) + ':' + str(event_id) + str(i)):
                 #get task
                 item_info = rdb.hgetall('item:' + str(user_id) + ':' + str(event_id) + ':' + str(i) + ':' + str(j))
                 item = (j,
@@ -328,15 +328,15 @@ def show_event_ajax(rdb, user_id, event_id):
                         item_info['icost'],
                         item_info['inotes'],
                         constants.getStatusStrFromInt(item_info['istatus']) )
-                t[7].insert(0, item)
+                t[6].insert(0, item)
             
             tasks.insert(0,t)
             #return info to template
-            event_info['tasks'] = tasks
-        
+        event_info['tasks'] = tasks
+        print event_info
         #TODO: create template to display event info
-        return template('eventajax.tpl', get_url=url, logged_in=logged_in, row=event_info)
-    
+        return template('eventajax.tpl', get_url=url, logged_in=logged_in, row=event_info, uid=user_id, eid=event_id)
+     
 
 @post('/delevent/<user_id:re:\d+>/<event_id:re:\d+>')
 def delete_event(rdb, user_id, event_id):
