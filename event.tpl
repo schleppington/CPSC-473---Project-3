@@ -29,10 +29,13 @@
             <label for="task_description">Task Info: {{task[2]}}</label><br/>
             <label for="task_cost">Task Cost: {{task[3]}}</label><br/>
             <label for="task_status">Task Status: {{task[4]}}</label><br/>
+	    <a href="/task/{{uid}}/{{eid}}/{{task[0]}}">
+		<button type="button">Details</button>
+	    </a>
             <form >
-                <button type="submit" formaction="/task/{{uid}}/{{eid}}/{{task[0]}}" formmethod="GET">Details</button>
                 <button type="submit" formaction="/deltask/{{uid}}/{{eid}}/{{task[0]}}" formmethod="POST">Delete</button>
             </form>
+	    
         </span>
     %end
 %#NEED TO UNPACK THE ITEMS FROM TASKS 
@@ -44,7 +47,7 @@
        %# <label for="item_status">Item Status: {{numitem[4]}}</label><br/>
         %#end
     %#end
-
+</div>
 <br><br/>
 <h2>Add a task to this event</h2><br/>
 <form action="/newtask/{{uid}}/{{eid}}" method="POST">
@@ -62,5 +65,4 @@
     </p>
 	<input id="newtask" type="submit" value="Add Task"/>
 </form>
-</div>
 <script src="/ajax.js"></script>

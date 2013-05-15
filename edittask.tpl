@@ -1,10 +1,5 @@
 %rebase layout.tpl url=get_url, logged_in=logged_in
 
-<form method="GET">
-  <input id="refresh" type="submit" value="Refresh"/>
-</form>
-
-
 <h2>Edit this task</h2><br/>
 <form action="/edittask/{{uid}}/{{eid}}/{{tid}}" method="POST">
     <p>
@@ -44,4 +39,3 @@
   <input id="edittask" type="submit" value="Submit"/>
 </form>
 </div>
-<script src="/ajax.js"></script>

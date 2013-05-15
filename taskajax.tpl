@@ -1,6 +1,3 @@
-%rebase layout.tpl url=get_url, logged_in=logged_in
-
-<div id="events">
 	<h3>Task </h3>
         <labelfor=event_name">Task Name: {{tinfo['tname']}}</label><br/>
         <label for="event_description">Task Description: {{tinfo['tinfo']}}</label><br/>
@@ -25,22 +22,3 @@
             </form>
         </span>
     %end
-</div>
-<br><br/>
-<h2>Add a item to this task</h2><br/>
-<form action="/newitem/{{uid}}/{{eid}}/{{tid}}" method="POST">
-    <p>
-        <label for="item_name">Item Name:</label><br/>
-        <input type="text" name="item_name" size="30"/><br/>
-    </p>
-    <p>
-        <label for="item_info">Description:</label><br/>
-        <input type="text" name="item_info" size="30"/><br/>
-    </p>
-    <p>
-        <label for="item_cost">Cost ($):</label><br/>
-        <input type="text" name="item_cost" size="30"/><br/>
-    </p>
-	<input id="newitem" type="submit" value="Add Item"/>
-</form>
-<script src="/ajax.js"></script>

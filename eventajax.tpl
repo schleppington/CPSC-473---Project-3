@@ -26,8 +26,10 @@
             <label for="task_description">Task Info: {{task[2]}}</label><br/>
             <label for="task_cost">Task Cost: {{task[3]}}</label><br/>
             <label for="task_status">Task Status: {{task[4]}}</label><br/>
+            <a href="/task/{{uid}}/{{eid}}/{{task[0]}}">
+		<button type="button">Details</button>
+	    </a>
             <form >
-                <button type="submit" formaction="/task/{{uid}}/{{eid}}/{{task[0]}}" formmethod="GET">Details</button>
                 <button type="submit" formaction="/deltask/{{uid}}/{{eid}}/{{task[0]}}" formmethod="POST">Delete</button>
             </form>
         </span>
@@ -41,21 +43,3 @@
        %# <label for="item_status">Item Status: {{numitem[4]}}</label><br/>
         %#end
     %#end
-
-<br><br/>
-<h2>Add a task to this event</h2><br/>
-<form action="/newtask/{{uid}}/{{eid}}" method="POST">
-    <p>
-        <label for="task_name">Task Name:</label><br/>
-        <input type="text" name="task_name" size="30"/><br/>
-    </p>
-    <p>
-        <label for="task_info">Description:</label><br/>
-        <input type="text" name="task_info" size="30"/><br/>
-    </p>
-    <p>
-        <label for="task_cost">Cost ($):</label><br/>
-        <input type="text" name="task_cost" size="30"/><br/>
-    </p>
-	<input id="newtask" type="submit" value="Add Task"/>
-</form>
