@@ -73,6 +73,7 @@ def default_route(rdb):
 
     return template('default.tpl', get_url=url, logged_in=logged_in, events=events)
 
+
 @get('//ajax')
 def default_ajax(rdb):
     logged_in = account.isLoggedIn()
@@ -189,7 +190,7 @@ def myacct_route(rdb):
 def modifyacct_route(rdb):
     logged_in = account.isLoggedIn()
     if logged_in:
-        info = account.getUserModInfo(rdb)
+        info = account.getUserInfo(rdb)
         return template('modifyacct.tpl', get_url=url, logged_in=logged_in, acct=info)
     else:
         redirect('/login')
@@ -224,6 +225,7 @@ def newEvent_submit(rdb):
     else:
         #failed to create event
         return "Failed to create event"
+
 
 @get('/event/<user_id:re:\d+>/<event_id:re:\d+>')
 def show_event(rdb, user_id, event_id):
@@ -272,6 +274,7 @@ def show_event(rdb, user_id, event_id):
     
     else:
         redirect('/userhome')
+
 
 @get('/event/<user_id:re:\d+>/<event_id:re:\d+>/ajax')
 def show_event_ajax(rdb, user_id, event_id):
@@ -365,8 +368,6 @@ def show_task_ajax(rdb, user_id, event_id, task_id):
         return template('taskajax.tpl', get_url=url, logged_in=logged_in, tinfo=task_info, uid=user_id, eid=event_id, tid = task_id)
 
 
-
-
 @post('/delevent/<user_id:re:\d+>/<event_id:re:\d+>')
 def delete_event(rdb, user_id, event_id):
     #ensure this event is owned by the current user
@@ -437,6 +438,7 @@ def delete_item(rdb, user_id, event_id, task_id, item_id):
     #return user to event page
     return redirect('/task/%s/%s/%s' % (user_id, event_id, task_id))
 
+
 @get('/newtask')
 def newTask_route(user_id, event_id):
     logged_in = account.isLoggedIn()
@@ -484,8 +486,6 @@ def newItem_submit(rdb, user_id, event_id, task_id):
         return "Failed to add item"
 
 
-
-
 @get('/adduser')
 def adduser_route():
     logged_in = account.isLoggedIn()
@@ -520,6 +520,7 @@ def remuser_submit(rdb):
         return result + " was successfully removed from this event's list of administrators."
     else:
         return "Failed to remove " + result + " from this event's list of administrators."
+
 
 @get('/edittask/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>')
 def show_edit_task(rdb, user_id, event_id, task_id):
@@ -556,7 +557,6 @@ def show_edit_task(rdb, user_id, event_id, task_id):
         redirect('/task/%s/%s/%s' % result)
     else:
         abort(400, "Error submiting your changes")
-
 
 
 @get('/:path#.+#', name='static')

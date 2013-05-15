@@ -66,6 +66,7 @@ def create_account(rdb):
     return logged_in
 
 
+
 ########################################################################
 #modify_account - updates the database with the user's new information.
 #   param - rdb - redis db object passed by plugin
@@ -103,7 +104,7 @@ def modify_account(rdb):
 
             #encrypt salted password
             encpw = hashlib.sha512(saltedpw).hexdigest()
-            rdb.hset('account:' + user_id, 'password', password)
+            rdb.hset('account:' + user_id, 'password', encpw)
         return True
     except:
         return False
@@ -199,6 +200,7 @@ def next_id(rdb):
     return  rdb.get('no')
 
 
+
 ########################################################################
 #accountHasAccess - checks whether an account can view the given event.
 #   param - rdb - redis db ojbect passed by plugin
@@ -225,6 +227,7 @@ def accountHasAccess(rdb, event_owner_id, event_id):
         return False
 
 
+
 ########################################################################
 #accountHasAdmin - checks whether an account can modify the given event.
 #   param - rdb - redis db ojbect passed by plugin
@@ -243,5 +246,4 @@ def accountHasAdmin(rdb, event_owner_id, event_id):
         return True
     else:
         return False
-
 
