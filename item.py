@@ -42,3 +42,25 @@ def create_item(rdb, user_id, event_id, task_id):
         return None
 
     return (user_id,  event_id, task_id)
+
+
+
+def edit_item(rdb, user_id, event_id, task_id, item_id):
+    try:
+        #get incoming fields
+        tname = request.POST.get('item_name','').strip()
+        tinfo = request.POST.get('item_info','').strip()
+        tcost = request.POST.get('item_cost','').strip()
+        tstatus = request.POST.get('status','').strip()
+
+        item_key = 'item:%s:%s:%s:%s' % (user_id, event_id, task_id, item_id)
+
+        rdb.hmset(item_key,
+            {  'iname' : tname,
+                'iinfo' : tinfo,
+                'icost' : tcost,
+                'istatus' : constants.getStatusIntFromStr(tstatus)
+             })
+        return (user_id, event_id, task_id)
+    except:
+        return None
