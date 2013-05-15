@@ -184,6 +184,8 @@ def myacct_route(rdb):
         acct = account.getUserInfo(rdb)
         acct.append(request.get_cookie('account', secret='pass'))
         return template('myaccount.tpl', get_url=url, logged_in=logged_in, acct=acct)
+    else:
+        redirect('/login')
 
 
 @get('/modifyacct')
