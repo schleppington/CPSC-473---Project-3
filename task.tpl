@@ -19,8 +19,10 @@
             <label for="task_description">Item Info: {{item[2]}}</label><br/>
             <label for="task_cost">Item Cost: {{item[3]}}</label><br/>
             <label for="task_status">Item Status: {{item[4]}}</label><br/>
+            <a href="/task/{{uid}}/{{eid}}/{{tid}}/{{item[0]}}">
+		<button type="button">Details</button>
+	    </a>
             <form >
-                <button type="submit" formaction="/task/{{uid}}/{{eid}}/{{tid}}/{{item[0]}}" formmethod="GET">Details</button>
                 <button type="submit" formaction="/delitem/{{uid}}/{{eid}}/{{tid}}/{{item[0]}}" formmethod="POST">Delete</button>
             </form>
         </span>
