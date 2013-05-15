@@ -550,7 +550,7 @@ def adduser_submit(rdb):
 
 
 @get('/editevent/<user_id:re:\d+>/<event_id:re:\d+>')
-def show_edit_event(user_id, event_id):
+def show_edit_event(rdb, user_id, event_id):
     #ensure user is logged in
     logged_in = account.isLoggedIn()
     if not logged_in:
@@ -569,7 +569,7 @@ def show_edit_event(user_id, event_id):
         
 
 @post('/editevent/<user_id:re:\d+>/<event_id:re:\d+>')
-def post_edit_event(user_id, event_id):
+def post_edit_event(rdb, user_id, event_id):
      #ensure user is logged in
     logged_in = account.isLoggedIn()
     if not logged_in:
@@ -584,6 +584,7 @@ def post_edit_event(user_id, event_id):
         redirect('/event/%s/%s' % result)
     else:
         abort(400, "Error submiting your changes")
+
 
 @get('/edittask/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>')
 def show_edit_task(rdb, user_id, event_id, task_id):
