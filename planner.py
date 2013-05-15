@@ -567,7 +567,7 @@ def show_edit_task(rdb, user_id, event_id, task_id):
 
 
 @post('/edittask/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>')
-def show_edit_task(rdb, user_id, event_id, task_id):
+def post_edit_task(rdb, user_id, event_id, task_id):
     #ensure user is logged in
     logged_in = account.isLoggedIn()
     if not logged_in:
@@ -578,6 +578,43 @@ def show_edit_task(rdb, user_id, event_id, task_id):
         abort(401, "Sorry, access is denied!")
 
     result = task.edit_task(rdb, user_id, event_id, task_id)
+    if result:
+        redirect('/task/%s/%s/%s' % result)
+    else:
+        abort(400, "Error submiting your changes")
+
+
+@get('/edititem/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>/<item_id:re:\d+>')
+def show_edit_item(rdb, user_id, event_id, task_id, item_id):
+    #ensure user is logged in
+    logged_in = account.isLoggedIn()
+    if not logged_in:
+        return redirect('/login')
+
+    #ensure user has access to change this event
+    if not account.accountHasAdmin(rdb, user_id, event_id):
+        abort(401, "Sorry, access is denied!")
+
+    #get event details to feed to template
+    item_info = rdb.hgetall('item:' + str(user_id) + ':' + str(event_id) + ':' + str(task_id) + ':' + str(item_id))
+    if item_info:
+        return template('edititem.tpl', get_url=url, logged_in=logged_in, iinfo=item_info, uid=user_id, eid=event_id, tid=task_id, iid=item_id)
+    else:
+        return abort(404, "Sorry, there is no Item for this task")
+        
+
+@post('/edititem/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>/<item_id:re:\d+>')
+def post_edit_item(rdb, user_id, event_id, task_id, item_id):
+    #ensure user is logged in
+    logged_in = account.isLoggedIn()
+    if not logged_in:
+        return redirect('/login')
+
+    #ensure user has access to change this event
+    if not account.accountHasAdmin(rdb, user_id, event_id):
+        abort(401, "Sorry, access is denied!")
+
+    result = item.edit_item(rdb, user_id, event_id, task_id, item_id)
     if result:
         redirect('/task/%s/%s/%s' % result)
     else:

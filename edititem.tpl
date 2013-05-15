@@ -6,14 +6,14 @@
 
 
 <h2>Edit this Item</h2><br/>
-<form action="/edititem/{{uid}}/{{eid}}/{{tid}}{{iid}}" method="POST">
+<form action="/edititem/{{uid}}/{{eid}}/{{tid}}/{{iid}}" method="POST">
     <p>
         <label for="item_name">Item Name:</label><br/>
         <input type="text" name="item_name" size="30" value="{{iinfo['iname']}}"/><br/>
     </p>
     <p>
         <label for="item_info">Description:</label><br/>
-        <input type="text" name="item_info" size="30" value="{{iinfo['iinfo']}}"/><br/>
+        <input type="text" name="item_info" size="30" value="{{iinfo['inotes']}}"/><br/>
     </p>
     <p>
         <label for="item_cost">Cost ($):</label><br/>
