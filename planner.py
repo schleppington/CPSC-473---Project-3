@@ -542,7 +542,7 @@ def show_edit_item(rdb, user_id, event_id, task_id, item_id):
     #get item details to feed to template
     item_info = rdb.hgetall('item:' + str(user_id) + ':' + str(event_id) + ':' + str(task_id) + ':' + str(item_id))
     if item_info:
-        return template('edititem.tpl', get_url=url, logged_in=logged_in, tinfo=task_info, uid=user_id, eid=event_id, tid=task_id, iid=item_id)
+        return template('edititem.tpl', get_url=url, logged_in=logged_in, iinfo=task_info, uid=user_id, eid=event_id, tid=task_id, iid=item_id)
     else:
         return abort(404, "Sorry, there is no task for this user and id")
 
@@ -587,11 +587,8 @@ def js():
 ########################################################################
 
 def getUserEventsList(rdb, no, pkey):
-    print "getUserEventsList entered"
-    print pkey
     lst = []
     event_ids = rdb.smembers('account:' + no + ':' + pkey)
-    print event_ids
     
     #Use the ID's to retrieve the event information we're looking for
     if event_ids and event_ids != 'None':
