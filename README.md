@@ -5,14 +5,14 @@ A Event Planning/To-do list site created using Bottle
 
 TODO:
   - Calendar view
-  - Implement Ajax for Calendar view
-    - Modify
-      - Events
-      	- template
-      	- logic
-      - Items
-      	- template
-      	- logic
+  - Implement Ajax for Calendar view (This is done for the front page list of events, just not the calendar view)
+  - Modify
+  	- Events
+      		- template
+      		- logic
+  	- Items
+      		- template
+      		- logic
   - Finish Account (Polish Front-end for modify portion)
   	- CheckAccess function (check to see if current user can access this task (are they invited?)
   - Invite other users to task
