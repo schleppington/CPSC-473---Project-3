@@ -19,8 +19,8 @@
             <label for="task_cost">Item Cost: {{item[2]}}</label><br/>
             <label for="task_status">Item Status: {{item[4]}}</label><br/>
             <form >
-                <button type="submit" formaction="/edititem/{{uid}}/{{eid}}/{{tid}}/{{item[0]}}" formmethod="GET">Edit</button>
                 %if perms:
+                <button type="submit" formaction="/edititem/{{uid}}/{{eid}}/{{tid}}/{{item[0]}}" formmethod="GET">Edit</button>
                 <button type="submit" formaction="/delitem/{{uid}}/{{eid}}/{{tid}}/{{item[0]}}" formmethod="POST">Delete</button>
                 %end
             </form>
