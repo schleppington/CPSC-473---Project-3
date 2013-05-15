@@ -103,7 +103,7 @@ def modify_account(rdb):
 
             #encrypt salted password
             encpw = hashlib.sha512(saltedpw).hexdigest()
-            rdb.hset('account:' + user_id, 'password', password)
+            rdb.hset('account:' + user_id, 'password', encpw)
         return True
     except:
         return False
