@@ -51,17 +51,14 @@ install(RedisPlugin())
 #       accounts:emails                             // Set of all user emails
 #       account:no:public                           // Set of all public events this account owns
 #       account:no:private                          // Set of all private events this account owns
+#       account:no:admin                            // Set of all events this account is allowed to modify
 #       account:no:invited                          // Set of all events this account has been invited to help plan
 #       events:public                               // Set of all public events
 #       eventadmins:owneracctno:eventno             // Set of all accounts allowed to modify this event
-#New:
+#       eventviewers:owneracctno:eventno            // Set of all accounts allowed to view this event
 #       taskids:ano:eno                             // List of all task ids associated with this event
 #       itemids:ano:eno:tno                         // List of all item ids associated with this task
 #
-#   CONSIDERATIONS:
-#       Invitations, there are 2 meanings here:
-#           1: Event numinvited -   This is the number of invitations the user has sent out.
-#           2: Account invited -    This is a set of events the user has been invited to help plan.
 ########################################################################
 
 
@@ -121,6 +118,9 @@ def userhome_route(rdb):
         #get list of private events for current user
         lstprivates = getUserEventsList(rdb, user_id, 'private')
         
+        #get list of events user has admin on
+        lstadmin = getUserEventsList(rdb, user_id, 'admin')
+
         #get list of invited to events for current user
         lstinvited = getUserEventsList(rdb, user_id, 'invited')
         
@@ -128,20 +128,24 @@ def userhome_route(rdb):
         lstpublics = getUserEventsList(rdb, user_id, 'public')
         
         return template('userhome.tpl',public_events=lstpublics,private_events=lstprivates,
-                        invited_events=lstinvited, get_url=url, logged_in=True, uid=user_id)
+                        invited_events=lstinvited, admin_events=lstadmin, get_url=url, 
+                        logged_in=True, uid=user_id)
     else:
         redirect('/login')
         
 
 @get('/userhome/ajax')
 def userhome_ajax(rdb):
-    if account.isLoggedIn():
+   if account.isLoggedIn():
         user = request.get_cookie('account', secret='pass')
         user_id = str(int(rdb.zscore('accounts:usernames', user)))
         
         #get list of private events for current user
         lstprivates = getUserEventsList(rdb, user_id, 'private')
         
+        #get list of events user has admin on
+        lstadmin = getUserEventsList(rdb, user_id, 'admin')
+
         #get list of invited to events for current user
         lstinvited = getUserEventsList(rdb, user_id, 'invited')
         
@@ -149,7 +153,8 @@ def userhome_ajax(rdb):
         lstpublics = getUserEventsList(rdb, user_id, 'public')
         
         return template('userhomeajax.tpl',public_events=lstpublics,private_events=lstprivates,
-                        invited_events=lstinvited, get_url=url, logged_in=True, uid=user_id)
+                        invited_events=lstinvited, admin_events=lstadmin, get_url=url, 
+                        logged_in=True, uid=user_id)
 
 
 @get('/signup')
@@ -572,7 +577,7 @@ def js():
 #getUserEventsList - gets the event description, event status, event type, and event due date
 #   param   - rdb - redis db ojbect passed by plugin
 #           - no - account number
-#           - pkey - partial key used to access a set (will either be 'private', 'public', or 'invited')
+#           - pkey - partial key used to access a set (will either be 'private', 'admin', 'public', or 'invited')
 #   return  - lst - the list of information gathered
 ########################################################################
 

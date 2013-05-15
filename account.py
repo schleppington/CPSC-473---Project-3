@@ -199,18 +199,49 @@ def next_id(rdb):
     return  rdb.get('no')
 
 
+########################################################################
+#accountHasAccess - checks whether an account can view the given event.
+#   param - rdb - redis db ojbect passed by plugin
+#   param - event_owner_id - the owner of the event's id
+#   param - event_id - the event's id
+#   return - boolean - true if the user can view this event, false otherwise.
+########################################################################
 
-def accountHasAccess(rdb, events_users_id, event_id):
-    #TODO check the list/set to see if this user can access this event
+def accountHasAccess(rdb, event_owner_id, event_id):
+    event_key = 'event:'+ str(event_owner_id) + ':' + str(event_id)
+    viewer_key = 'eventviewers:' + str(event_owner_id) + ':' + str(event_id)
 
-    #do checks here
-    return True
+    #if the user has admin, they can view the event.
+    admin = accountHasAdmin(rdb, event_owner_id, event_id)
+
+    #if etype is 0, the event is public, so all can view.
+    etype  = int(rdb.hget(event_key, 'etype'))
+
+    username = request.get_cookie('account', secret='pass')
+
+    if etype == 0 or admin or rdb.sismember(viewer_key, username):
+        return True
+    else:
+        return False
 
 
-def accountHasAdmin(rdb, events_users_id, event_id):
-    #TODO check the list/set to see if this user can Modify this event
+########################################################################
+#accountHasAdmin - checks whether an account can modify the given event.
+#   param - rdb - redis db ojbect passed by plugin
+#   param - event_owner_id - the owner of the event's id
+#   param - event_id - the event's id
+#   return - boolean - true if the user can modify this event, false otherwise.
+########################################################################
 
-    #do checks here
-    return True
+def accountHasAdmin(rdb, event_owner_id, event_id):
+    admin_key = 'eventadmins:'+ str(event_owner_id) + ':' + str(event_id)
+    event_key = 'event:'+ str(event_owner_id) + ':' + str(event_id)
+    #Check the list/set to see if this user can Modify this event
+    euser = rdb.hget(event_key, 'username')
+    username = request.get_cookie('account', secret='pass')
+    if euser == username or rdb.sismember(admin_key, username):
+        return True
+    else:
+        return False
 
 

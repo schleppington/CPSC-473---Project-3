@@ -2,7 +2,7 @@ var doGet = function (URL) {
     var xhr = new XMLHttpRequest(),
         events = document.getElementById("events");
      
-    xhr.open("GET", URL+"/ajax");
+    xhr.open("GET", URL+"/ajax", true);
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     xhr.onreadystatechange = function () {
         if (xhr.readyState !== 4) {
