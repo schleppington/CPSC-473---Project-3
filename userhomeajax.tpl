@@ -29,7 +29,23 @@
 	%end
 	</div>
 <br style="clear:left" />
+    <div>
 	<h3>Events I Can Assist With:</h3>
+	%for admin in admin_events:
+		<span class="list_item">
+	    <label for="event_name">Event Name: {{admin[1]}}</label><br/>
+	    <label for="event_description">Event Description: {{admin[2]}}</label><br/>
+	    <label for="event_duedate">Date Of Event: {{admin[5]}}</label><br/><br/>
+        <form >
+            <button type="submit" formaction="/event/{{uid}}/{{admin[0]}}" formmethod="GET">Delete</button>
+            <button type="submit" formaction="/delevent/{{uid}}/{{admin[0]}}" formmethod="POST">Delete</button>
+        </form>
+        </br></br>
+	   </span>
+	%end
+    </div>
+    <div>
+	<h3>Events I've Been Invited To:</h3>
 	%for invited in invited_events:
 		<span class="list_item">
 	    <label for="event_name">Event Name: {{invited[1]}}</label><br/>
@@ -42,3 +58,5 @@
         </br></br>
 	   </span>
 	%end
+    </div>
+</div>
