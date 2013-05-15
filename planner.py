@@ -378,10 +378,10 @@ def show_task_ajax(rdb, user_id, event_id, task_id):
         task_info['items'] = items
 
         permission = account.accountHasAdmin(rdb, user_id, event_id)
-        return template('task.tpl', get_url=url, logged_in=logged_in,
-                                    tinfo=task_info, uid=user_id,
-                                    eid=event_id, tid = task_id,
-                                    perms=permission)
+        return template('taskajax.tpl', get_url=url, logged_in=logged_in,
+                                        tinfo=task_info, uid=user_id,
+                                        eid=event_id, tid = task_id,
+                                        perms=permission)
 
 
 @post('/delevent/<user_id:re:\d+>/<event_id:re:\d+>')
