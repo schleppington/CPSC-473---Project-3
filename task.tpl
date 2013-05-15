@@ -27,7 +27,8 @@
     %end
 </div>
 <br><br/>
-<h2>Add a item to this task</h2><br/>
+%if perms:
+<h2>Add an item to this task</h2><br/>
 <form action="/newitem/{{uid}}/{{eid}}/{{tid}}" method="POST">
     <p>
         <label for="item_name">Item Name:</label><br/>
@@ -43,4 +44,5 @@
     </p>
 	<input id="newitem" type="submit" value="Add Item"/>
 </form>
+%end
 <script src="/ajax.js"></script>

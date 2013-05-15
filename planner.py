@@ -268,9 +268,12 @@ def show_event(rdb, user_id, event_id):
             tasks.insert(0,t)
             #return info to template
         event_info['tasks'] = tasks
-        print event_info
-        #TODO: create template to display event info
-        return template('event.tpl', get_url=url, logged_in=logged_in, row=event_info, uid=user_id, eid=event_id)
+
+        permission = account.accountHasAdmin(rdb, user_id, event_id)
+        print permission
+        return template('event.tpl', get_url=url, logged_in=logged_in,
+                                     row=event_info, uid=user_id,
+                                     perms=permission, eid=event_id)
     
     else:
         redirect('/userhome')
@@ -316,8 +319,11 @@ def show_event_ajax(rdb, user_id, event_id):
             tasks.insert(0,t)
             #return info to template
         event_info['tasks'] = tasks
-        print event_info
-        return template('eventajax.tpl', get_url=url, logged_in=logged_in, row=event_info, uid=user_id, eid=event_id)
+
+        permission = account.accountHasAdmin(rdb, user_id, event_id)
+        return template('eventajax.tpl', get_url=url, logged_in=logged_in,
+                                         row=event_info, uid=user_id,
+                                         perms=permission, eid=event_id)
 
 
 @get('/task/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>')
@@ -341,7 +347,12 @@ def show_task(rdb, user_id, event_id, task_id):
             items.insert(0, item)
             print item
         task_info['items'] = items
-        return template('task.tpl', get_url=url, logged_in=logged_in, tinfo=task_info, uid=user_id, eid=event_id, tid = task_id)
+
+        permission = account.accountHasAdmin(rdb, user_id, event_id)
+        return template('task.tpl', get_url=url, logged_in=logged_in,
+                                    tinfo=task_info, uid=user_id,
+                                    eid=event_id, tid = task_id,
+                                    perms=permission)
 
 
 @get('/task/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>/ajax')
@@ -365,7 +376,12 @@ def show_task_ajax(rdb, user_id, event_id, task_id):
             items.insert(0, item)
             print item
         task_info['items'] = items
-        return template('taskajax.tpl', get_url=url, logged_in=logged_in, tinfo=task_info, uid=user_id, eid=event_id, tid = task_id)
+
+        permission = account.accountHasAdmin(rdb, user_id, event_id)
+        return template('task.tpl', get_url=url, logged_in=logged_in,
+                                    tinfo=task_info, uid=user_id,
+                                    eid=event_id, tid = task_id,
+                                    perms=permission)
 
 
 @post('/delevent/<user_id:re:\d+>/<event_id:re:\d+>')
@@ -520,6 +536,15 @@ def remuser_submit(rdb):
         return result + " was successfully removed from this event's list of administrators."
     else:
         return "Failed to remove " + result + " from this event's list of administrators."
+
+
+@post('/invuser')
+def adduser_submit(rdb):
+    result = event.invUserToEvent(rdb)
+    if result:
+        return result + " was successfully added to this event's invited list."
+    else:
+        return "Failed to add " + result + " to this event's invited list."
 
 
 @get('/edittask/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>')

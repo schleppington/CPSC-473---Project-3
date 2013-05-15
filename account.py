@@ -238,10 +238,10 @@ def accountHasAccess(rdb, event_owner_id, event_id):
 
 def accountHasAdmin(rdb, event_owner_id, event_id):
     admin_key = 'event:'+ str(event_owner_id) + ':' + str(event_id) + ':admins'
-    event_key = 'event:'+ str(event_owner_id) + ':' + str(event_id)
-    #Check the list/set to see if this user can Modify this event
-    euser = rdb.hget(event_key, 'username')
+    euser = rdb.hget('account:' + str(event_owner_id), 'username')
     username = request.get_cookie('account', secret='pass')
+
+    #Check the list/set to see if this user can Modify this event
     if euser == username or rdb.sismember(admin_key, username):
         return True
     else:

@@ -49,6 +49,7 @@
     %#end
 </div>
 <br><br/>
+%if perms:
 <h2>Add a task to this event</h2><br/>
 <form action="/newtask/{{uid}}/{{eid}}" method="POST">
     <p>
@@ -65,4 +66,5 @@
     </p>
 	<input id="newtask" type="submit" value="Add Task"/>
 </form>
+%end
 <script src="/ajax.js"></script>
