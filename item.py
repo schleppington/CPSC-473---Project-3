@@ -18,7 +18,7 @@ def create_item(rdb, user_id, event_id, task_id):
     #Get the item data from the form:
     iname = request.POST.get('item_name','').strip()
     icost = request.POST.get('item_cost','').strip()
-    inotes = request.POST.get('item_notes','').strip()
+    inotes = request.POST.get('item_info','').strip()
     istatus = constants.STATUS_NEEDS_ATTENTION
     
     #Create new item_id
