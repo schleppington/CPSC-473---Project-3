@@ -234,7 +234,7 @@ def accountHasAccess(rdb, event_owner_id, event_id):
 ########################################################################
 
 def accountHasAdmin(rdb, event_owner_id, event_id):
-    admin_key = 'eventadmins:'+ str(event_owner_id) + ':' + str(event_id)
+    admin_key = 'event:'+ str(event_owner_id) + ':' + str(event_id) + ':admins'
     event_key = 'event:'+ str(event_owner_id) + ':' + str(event_id)
     #Check the list/set to see if this user can Modify this event
     euser = rdb.hget(event_key, 'username')

@@ -53,7 +53,7 @@ def create_event(rdb):
             rdb.sadd('account:' + user_id + ':private', 'event:' + user_id + ':' + event_id)
         
         #add owner to admin list for this event
-        rdb.sadd('eventadmins' + user_id + ':' + event_id, user_id)
+        rdb.sadd('event:' + user_id + ':' + event_id + ':admins', user_id)
         
         return (user_id,  event_id)
     except:
@@ -77,7 +77,7 @@ def addAdminToEvent(rdb):
     if admin_no:
         event = 'event:' + owner_id + ':' + event_no
         rdb.sadd('account:' + admin_no + ':invited', event)
-        rdb.sadd('eventadmins:' + owner_id + ':' + event_no, username)
+        rdb.sadd('event:' + owner_id + ':' + event_no + ':admins', username)
         return username
     else:
         return False
@@ -100,7 +100,7 @@ def remAdminFromEvent(rdb):
     if admin_no:
         event = 'event:' + owner_id + ':' + event_no
         rdb.srem('account:' + admin_no + ':invited', event)
-        rdb.srem('eventadmins:' + owner_id + ':' + event_no, username)
+        rdb.srem('event:' + owner_id + ':' + event_no + ':admins', username)
         return username
     else:
         return False
