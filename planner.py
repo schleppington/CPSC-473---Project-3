@@ -455,8 +455,6 @@ def newItem_submit(rdb, user_id, event_id, task_id):
         return "Failed to add item"
 
 
-
-
 @get('/adduser')
 def adduser_route():
     logged_in = account.isLoggedIn()
@@ -492,6 +490,7 @@ def remuser_submit(rdb):
     else:
         return "Failed to remove " + result + " from this event's list of administrators."
 
+
 @get('/edittask/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>')
 def show_edit_task(rdb, user_id, event_id, task_id):
     #ensure user is logged in
@@ -512,7 +511,7 @@ def show_edit_task(rdb, user_id, event_id, task_id):
 
 
 @post('/edittask/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>')
-def show_edit_task(rdb, user_id, event_id, task_id):
+def post_edit_task(rdb, user_id, event_id, task_id):
     #ensure user is logged in
     logged_in = account.isLoggedIn()
     if not logged_in:
@@ -528,6 +527,41 @@ def show_edit_task(rdb, user_id, event_id, task_id):
     else:
         abort(400, "Error submiting your changes")
 
+
+@get('/edititem/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>/<item_id:re:\d+>')
+def show_edit_item(rdb, user_id, event_id, task_id, item_id):
+     #ensure user is logged in
+    logged_in = account.isLoggedIn()
+    if not logged_in:
+        return redirect('/login')
+
+    #ensure user has access to change this event
+    if not account.accountHasAdmin(rdb, user_id, event_id):
+        abort(401, "Sorry, access is denied!")
+
+    #get item details to feed to template
+    item_info = rdb.hgetall('item:' + str(user_id) + ':' + str(event_id) + ':' + str(task_id) + ':' + str(item_id))
+    if item_info:
+        return template('edititem.tpl', get_url=url, logged_in=logged_in, iinfo=task_info, uid=user_id, eid=event_id, tid=task_id, iid=item_id)
+    else:
+        return abort(404, "Sorry, there is no task for this user and id")
+
+@post('/edititem/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>/<item_id:re:\d+>')
+def post_edit_item(rdb, user_id, event_id, task_id, item_id):
+    #ensure user is logged in
+    logged_in = account.isLoggedIn()
+    if not logged_in:
+        return redirect('/login')
+
+    #ensure user has access to change this event
+    if not account.accountHasAdmin(rdb, user_id, event_id):
+        abort(401, "Sorry, access is denied!")
+
+    result = item.edit_item(rdb, user_id, event_id, task_id, item_id)
+    if result:
+        redirect('/task/%s/%s/%s' % result)
+    else:
+        abort(400, "Error submiting your changes")
 
 
 @get('/:path#.+#', name='static')
@@ -553,11 +587,8 @@ def js():
 ########################################################################
 
 def getUserEventsList(rdb, no, pkey):
-    print "getUserEventsList entered"
-    print pkey
     lst = []
     event_ids = rdb.smembers('account:' + no + ':' + pkey)
-    print event_ids
     
     #Use the ID's to retrieve the event information we're looking for
     if event_ids and event_ids != 'None':

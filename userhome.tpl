@@ -16,9 +16,9 @@
 	    <label for="event_name">Event Name: {{public[1]}}</label><br/>
 	    <label for="event_description">Event Description: {{public[2]}}</label><br/>
 	    <label for="event_duedate">Date Of Event: {{public[5]}}</label><br/><br/>
-        <a href="/event/{{uid}}/{{public[0]}}">details</a>
-        <form action="/delevent/{{uid}}/{{public[0]}}" method="POST">
-            <button type="submit">Delete</button>
+        <form >
+            <button type="submit" formaction="/event/{{uid}}/{{public[0]}}" formmethod="GET">Details</button>
+            <button type="submit" formaction="/delevent/{{uid}}/{{public[0]}}" formmethod="POST">Delete</button>
         </form>
         </br></br>
 	   </span>
@@ -31,9 +31,9 @@
 	    <label for="event_name">Event Name: {{private[1]}}</label><br/>
 	    <label for="event_description">Event Description: {{private[2]}}</label><br/>
 	    <label for="event_duedate">Date Of Event: {{private[5]}}</label><br/><br/>
-        <a href="/event/{{uid}}/{{private[0]}}">details</a>
-        <form action="/delevent/{{uid}}/{{private[0]}}" method="POST">
-            <button type="submit">Delete</button>
+        <form >
+            <button type="submit" formaction="/event/{{uid}}/{{private[0]}}" formmethod="GET">Details</button>
+            <button type="submit" formaction="/delevent/{{uid}}/{{private[0]}}" formmethod="POST">Delete</button>
         </form>
         </br></br>
 	    </span>
@@ -46,9 +46,9 @@
 	    <label for="event_name">Event Name: {{invited[1]}}</label><br/>
 	    <label for="event_description">Event Description: {{invited[2]}}</label><br/>
 	    <label for="event_duedate">Date Of Event: {{invited[5]}}</label><br/><br/>
-        <a href="/event/{{uid}}/{{invited[0]}}">details</a>
-        <form action="/delevent/{{uid}}/{{invited[0]}}" method="POST">
-            <button type="submit">Delete</button>
+        <form >
+            <button type="submit" formaction="/event/{{uid}}/{{invited[0]}}" formmethod="GET">Delete</button>
+            <button type="submit" formaction="/delevent/{{uid}}/{{invited[0]}}" formmethod="POST">Delete</button>
         </form>
         </br></br>
 	   </span>
