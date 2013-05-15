@@ -61,6 +61,29 @@ def create_event(rdb):
 
 
 ########################################################################
+#invUserToEvent - Gives another user rights to view the event.
+#   param   - rdb - redis db ojbect passed by plugin
+#   return  - useremail - The email address retrieved from the form and
+#                         added to the list of people invited.
+########################################################################
+def invUserToEvent(rdb):
+    useremail = request.POST.get('useremail','').strip()
+    owner_id = request.POST.get('owner_id','').strip()
+    event_no = request.POST.get('event_no','').strip()
+
+    #Retrieve user account number from database
+    admin_no = str(rdb.zscore('accounts:usernames', username))
+
+    #If account was found, add account to admin list:
+    if admin_no:
+        event = 'event:' + owner_id + ':' + event_no
+        rdb.sadd('account:' + admin_no + ':invite', event)
+    
+    rdb.sadd('event:' + owner_id + ':' + event_no + ':invited', useremail)
+    return usermail
+
+
+########################################################################
 #addAdminToEvent - Gives another user rights to modify event.
 #   param   - rdb - redis db ojbect passed by plugin
 #   return  - username - The username of the account added.
@@ -76,7 +99,7 @@ def addAdminToEvent(rdb):
     #If account was found, add account to admin list:
     if admin_no:
         event = 'event:' + owner_id + ':' + event_no
-        rdb.sadd('account:' + admin_no + ':invited', event)
+        rdb.sadd('account:' + admin_no + ':admin', event)
         rdb.sadd('event:' + owner_id + ':' + event_no + ':admins', username)
         return username
     else:
@@ -99,7 +122,7 @@ def remAdminFromEvent(rdb):
     #If account was found, add account to admin list:
     if admin_no:
         event = 'event:' + owner_id + ':' + event_no
-        rdb.srem('account:' + admin_no + ':invited', event)
+        rdb.srem('account:' + admin_no + ':admin', event)
         rdb.srem('event:' + owner_id + ':' + event_no + ':admins', username)
         return username
     else:
