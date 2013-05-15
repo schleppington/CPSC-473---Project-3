@@ -547,6 +547,42 @@ def adduser_submit(rdb):
         return "Failed to add " + result + " to this event's invited list."
 
 
+@get('/editevent/<user_id:re:\d+>/<event_id:re:\d+>')
+def show_edit_event(user_id, event_id):
+    #ensure user is logged in
+    logged_in = account.isLoggedIn()
+    if not logged_in:
+        return redirect('/login')
+
+    #ensure user has access to change this event
+    if not account.accountHasAdmin(rdb, user_id, event_id):
+        abort(401, "Sorry, access is denied!")
+
+    #get event details to feed to template
+    event_info = rdb.hgetall('event:' + str(user_id) + ':' + str(event_id))
+    if event_info:
+        return template('editevent.tpl', get_url=url, logged_in=logged_in, einfo=event_info, uid=user_id, eid=event_id)
+    else:
+        return abort(404, "Sorry, there is no task for this user and id")
+        
+
+@post('/editevent/<user_id:re:\d+>/<event_id:re:\d+>')
+def post_edit_event(user_id, event_id):
+     #ensure user is logged in
+    logged_in = account.isLoggedIn()
+    if not logged_in:
+        return redirect('/login')
+
+    #ensure user has access to change this event
+    if not account.accountHasAdmin(rdb, user_id, event_id):
+        abort(401, "Sorry, access is denied!")
+
+    result = event.edit_event(rdb, user_id, event_id, task_id)
+    if result:
+        redirect('/event/%s/%s' % result)
+    else:
+        abort(400, "Error submiting your changes")
+
 @get('/edittask/<user_id:re:\d+>/<event_id:re:\d+>/<task_id:re:\d+>')
 def show_edit_task(rdb, user_id, event_id, task_id):
     #ensure user is logged in

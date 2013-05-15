@@ -5,6 +5,17 @@ from bottle_redis import RedisPlugin
 
 import constants, account
 
+#      Key: event:ano:eno
+#       Fields:		'ename' : ename,                        str
+#                   'eduedate' : eduedate,                  datetime
+#                   'eventdesc' : eventdesc,                str
+#                   'numinvited' : numinvited,              int
+#                   'responded' : responded,                int
+#                   'numattending' : numattending,          int
+#                   'estatus' : 'estatus',                  int - from constants
+#                   'etype' : etype,                        int - from constants
+#                   'numtasks' : numtasks                   int
+
 ########################################################################
 #create_event - create a new event entry in redis db
 #   param   - rdb - redis db ojbect passed by plugin
@@ -56,6 +67,33 @@ def create_event(rdb):
         rdb.sadd('event:' + user_id + ':' + event_id + ':admins', user_id)
         
         return (user_id,  event_id)
+    except:
+        return None
+
+
+
+def edit_event(rdb, user_id, event_id):
+    try:
+        #get incoming fields
+        etype = request.POST.get('visibility','').strip()
+        estatus = request.POST.get('status','').strip()
+        eduedate = request.POST.get('datepicker','').strip()
+        eventdesc = request.POST.get('event_description','').strip()
+        ename = request.POST.get('event_name','').strip()
+
+        task_key = 'task:%s:%s' % (user_id, event_id)
+
+        rdb.hmset(task_key,
+            {  'ename' : ename,                        
+                   'eduedate' : eduedate,                  
+                   'eventdesc' : eventdesc,                
+                   'numinvited' : numinvited,              
+                   'responded' : responded,                
+                   'numattending' : numattending,          
+                   'estatus' : 'estatus',                  
+                   'etype' : etype,               
+             })
+        return (user_id, event_id, task_id)
     except:
         return None
 

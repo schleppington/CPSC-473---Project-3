@@ -7,6 +7,7 @@
 	    <label for="event_duedate">Date Of Event: {{public[5]}}</label><br/><br/>
         <form >
             <button type="submit" formaction="/event/{{uid}}/{{public[0]}}" formmethod="GET">Details</button>
+            <button type="submit" formaction="/editevent/{{uid}}/{{public[0]}}" formmethod="GET">Edit</button>
             <button type="submit" formaction="/delevent/{{uid}}/{{public[0]}}" formmethod="POST">Delete</button>
         </form>
         </br></br>
@@ -22,6 +23,7 @@
 	    <label for="event_duedate">Date Of Event: {{private[5]}}</label><br/><br/>
         <form >
             <button type="submit" formaction="/event/{{uid}}/{{private[0]}}" formmethod="GET">Details</button>
+            <button type="submit" formaction="/editevent/{{uid}}/{{public[0]}}" formmethod="GET">Edit</button>
             <button type="submit" formaction="/delevent/{{uid}}/{{private[0]}}" formmethod="POST">Delete</button>
         </form>
         </br></br>
@@ -38,6 +40,7 @@
 	    <label for="event_duedate">Date Of Event: {{admin[5]}}</label><br/><br/>
         <form >
             <button type="submit" formaction="/event/{{uid}}/{{admin[0]}}" formmethod="GET">Delete</button>
+            <button type="submit" formaction="/editevent/{{uid}}/{{public[0]}}" formmethod="GET">Edit</button>
             <button type="submit" formaction="/delevent/{{uid}}/{{admin[0]}}" formmethod="POST">Delete</button>
         </form>
         </br></br>
