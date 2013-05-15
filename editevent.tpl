@@ -30,6 +30,6 @@ Enter Your Event's Details:<br/>
         </select>
     </p>
     <p>
-        <input type="submit" value="Edit Event"><br/>
+        <input type="submit" value="Submit Changes"><br/>
     </p>
 </form>
