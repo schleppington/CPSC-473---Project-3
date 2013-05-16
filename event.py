@@ -104,21 +104,30 @@ def edit_event(rdb, user_id, event_id):
 #   return  - useremail - The email address retrieved from the form and
 #                         added to the list of people invited.
 ########################################################################
-def invUserToEvent(rdb):
-    useremail = request.POST.get('useremail','').strip()
-    owner_id = request.POST.get('owner_id','').strip()
-    event_no = request.POST.get('event_no','').strip()
-
+def invUserToEvent(rdb, owner_id, event_no):
+    username = request.POST.get('username', '').strip()
+    Add = request.POST.get('perm','').strip()
+    print Add
     #Retrieve user account number from database
     admin_no = str(rdb.zscore('accounts:usernames', username))
 
-    #If account was found, add account to admin list:
-    if admin_no:
-        event = 'event:' + owner_id + ':' + event_no
-        rdb.sadd('account:' + admin_no + ':invite', event)
+    if Add=="Invite":   
+        #If account was found, add account to admin list:
+        if admin_no:
+            event = 'event:' + str(owner_id) + ':' + str(event_no)
+            rdb.sadd('account:' + admin_no + ':invite', event)
     
-    rdb.sadd('event:' + owner_id + ':' + event_no + ':invited', useremail)
-    return usermail
+        rdb.sadd('event:' + str(owner_id) + ':' + str(event_no) + ':invited', username)
+
+    else:
+        if admin_no:
+            event = 'event:' + str(owner_id) + ':' + str(event_no)
+            rdb.sadd('account:' + admin_no + ':admin', event)
+            rdb.sadd('event:' + str(owner_id) + ':' + str(event_no) + ':admins', username)
+        else:
+            return False
+    
+    return username
 
 
 ########################################################################

@@ -74,5 +74,18 @@
     </p>
 	<input id="newtask" type="submit" value="Add Task"/>
 </form>
+
+<h2>Add someone to this event</h2><br/>
+
+<form action="/invuser/{{uid}}/{{eid}}" method="POST">
+    <input type="radio" name="perm" value="Invite"> Invite 
+    <input type="radio" name="perm" value="Administrator"> Administrator
+    <p>
+        <label for="username">Add Person:</label><br/>
+        <input type="text" name="username" size="30"/><br/>
+    </p>
+    
+	<input type="submit" value="Add"/>
+</form>
 %end
 <script src="/ajax.js"></script>

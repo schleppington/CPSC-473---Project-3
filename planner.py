@@ -544,9 +544,9 @@ def remuser_submit(rdb):
         return "Failed to remove " + result + " from this event's list of administrators."
 
 
-@post('/invuser')
-def adduser_submit(rdb):
-    result = event.invUserToEvent(rdb)
+@post('/invuser/<user_id:re:\d+>/<event_id:re:\d+>')
+def adduser_submit(rdb, user_id, event_id):
+    result = event.invUserToEvent(rdb, user_id, event_id)
     if result:
         return result + " was successfully added to this event's invited list."
     else:
