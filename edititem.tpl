@@ -41,7 +41,7 @@
         </select>
 %end
     </p><br/>
-  <input id="edititem" type="submit" value="Submit"/>
+  <input id="edititem" type="submit" value="Submit Changes"/>
 </form>
 </div>
 <script src="/ajax.js"></script>
