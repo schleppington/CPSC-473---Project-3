@@ -8,7 +8,7 @@ Enter Your Event's Details:<br/>
     </p>
     <p>
         <label for="event_description">Event Description:</label><br/>
-        <textarea name="event_description" cols="60" rows="10" value="{{einfo['eventdesc']}}"></textarea><br/>
+        <textarea name="event_description" cols="60" rows="10">{{einfo['eventdesc']}}</textarea><br/>
     </p>
     <p>
         <label for="datepicker">Select A Date:</label><br/>
@@ -30,6 +30,6 @@ Enter Your Event's Details:<br/>
         </select>
     </p>
     <p>
-        <input type="submit" value="Create Event"><br/>
+        <input type="submit" value="Submit Changes"><br/>
     </p>
 </form>

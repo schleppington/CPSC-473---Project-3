@@ -36,6 +36,6 @@
         </select>
 %end
     </p><br/>
-  <input id="edittask" type="submit" value="Submit"/>
+  <input id="edittask" type="submit" value="Submit Changes"/>
 </form>
 </div>
