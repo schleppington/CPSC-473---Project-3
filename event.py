@@ -118,6 +118,7 @@ def invUserToEvent(rdb, owner_id, event_no):
             rdb.sadd('account:' + admin_no + ':invite', event)
     
         rdb.sadd('event:' + str(owner_id) + ':' + str(event_no) + ':invited', username)
+        rdb.hincrby('event' + str(owner_id) + ':' + str(event_no), 'numinvited', 1)
 
     else:
         if admin_no:
