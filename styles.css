@@ -45,11 +45,7 @@ a:active {
     border-right: 1px solid grey;
     border-left: 1px solid grey;
 }
-#events div
-{
-	margin:10px 80px 10px 10px;
-	float:left;
-}
+
 .list_item
 {
 	background:lightgrey;
